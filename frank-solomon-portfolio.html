@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frank Solomon Marvelous — Senior Software Engineer</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --card: #1a1d26;
+    --accent: #6c8cff;
+    --text: #e8eaf0;
+    --muted: #9aa0ae;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1rem 8%;
+    background: rgba(15,17,21,.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid #22252f;
+  }
+  nav .logo { font-weight: 700; font-size: 1.2rem; color: var(--accent); }
+  nav a { color: var(--muted); text-decoration: none; margin-left: 1.5rem; transition: color .2s; }
+  nav a:hover { color: var(--text); }
+
+  /* HERO */
+  .hero {
+    min-height: 90vh;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 0 8%;
+  }
+  .hero .hello { color: var(--accent); font-size: 1.1rem; margin-bottom: .5rem; }
+  .hero h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); line-height: 1.1; }
+  .hero p.sub { color: var(--muted); max-width: 560px; margin: 1.2rem 0 2rem; font-size: 1.1rem; }
+  .btn {
+    display: inline-block; background: var(--accent); color: #0f1115;
+    padding: .8rem 1.8rem; border-radius: 8px; text-decoration: none;
+    font-weight: 600; width: fit-content; transition: transform .15s, box-shadow .15s;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(108,140,255,.35); }
+  .btn.ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent); margin-left: .8rem; }
+
+  /* SECTIONS */
+  section { padding: 5rem 8%; }
+  .section-title { font-size: 1.9rem; margin-bottom: 2rem; }
+  .section-title::after { content: ""; display: block; width: 56px; height: 3px; background: var(--accent); margin-top: .5rem; border-radius: 2px; }
+
+  /* ABOUT */
+  .about-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 3rem; align-items: start; }
+  .avatar {
+    width: 100%; aspect-ratio: 1; border-radius: 16px;
+    background: linear-gradient(135deg, var(--accent), #a25cff);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 4rem; font-weight: 700; color: #fff;
+  }
+  .about p { color: var(--muted); margin-bottom: 1rem; }
+
+  /* EXPERIENCE */
+  .timeline { border-left: 2px solid #262a35; padding-left: 2rem; }
+  .job { position: relative; margin-bottom: 2.5rem; }
+  .job::before {
+    content: ""; position: absolute; left: calc(-2rem - 7px); top: 6px;
+    width: 12px; height: 12px; border-radius: 50%; background: var(--accent);
+  }
+  .job .role { font-size: 1.15rem; font-weight: 600; }
+  .job .company { color: var(--accent); font-size: .95rem; margin-bottom: .2rem; }
+  .job .dates { color: var(--muted); font-size: .85rem; margin-bottom: .6rem; }
+  .job ul { color: var(--muted); font-size: .95rem; padding-left: 1.2rem; }
+  .job li { margin-bottom: .3rem; }
+
+  /* SKILLS */
+  .skill-group { margin-bottom: 1.5rem; }
+  .skill-group h4 { color: var(--text); margin-bottom: .6rem; font-size: .95rem; text-transform: uppercase; letter-spacing: .05em; }
+  .skills-list { display: flex; flex-wrap: wrap; gap: .8rem; }
+  .skill {
+    background: var(--card); border: 1px solid #262a35; border-radius: 999px;
+    padding: .5rem 1.2rem; color: var(--muted); font-size: .9rem;
+    transition: border-color .2s, color .2s;
+  }
+  .skill:hover { border-color: var(--accent); color: var(--text); }
+
+  /* PROJECTS */
+  .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+  .project-card {
+    background: var(--card); border: 1px solid #262a35; border-radius: 14px;
+    padding: 1.8rem; transition: transform .2s, border-color .2s;
+  }
+  .project-card:hover { transform: translateY(-4px); border-color: var(--accent); }
+  .project-card .emoji { font-size: 2rem; margin-bottom: .8rem; }
+  .project-card h3 { margin-bottom: .5rem; }
+  .project-card p { color: var(--muted); font-size: .95rem; }
+  .tags { margin-top: 1rem; display: flex; flex-wrap: wrap; gap: .5rem; }
+  .tag { font-size: .75rem; color: var(--accent); background: rgba(108,140,255,.12); padding: .2rem .6rem; border-radius: 4px; }
+
+  /* CERTIFICATIONS */
+  .cert { background: var(--card); border: 1px solid #262a35; border-radius: 12px; padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; width: fit-content; }
+  .cert .badge { font-size: 1.6rem; }
+  .cert strong { display: block; }
+  .cert span { color: var(--muted); font-size: .9rem; }
+
+  /* CONTACT */
+  .contact p { color: var(--muted); max-width: 480px; margin-bottom: 1.5rem; }
+  .socials { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .socials a {
+    color: var(--text); text-decoration: none; border: 1px solid #262a35;
+    padding: .6rem 1.2rem; border-radius: 8px; transition: border-color .2s;
+  }
+  .socials a:hover { border-color: var(--accent); }
+
+  footer { text-align: center; padding: 2rem; color: var(--muted); font-size: .85rem; border-top: 1px solid #22252f; }
+
+  @media (max-width: 720px) {
+    .about-grid { grid-template-columns: 1fr; }
+    .avatar { max-width: 220px; }
+    nav a { margin-left: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">FSM</span>
+  <div>
+    <a href="#about">About</a>
+    <a href="#experience">Experience</a>
+    <a href="#skills">Skills</a>
+    <a href="#projects">Projects</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hello">Hi, my name is</div>
+  <h1>Frank Solomon, Marvelous.<br>I build secure, scalable systems.</h1>
+  <p class="sub">Senior Software Engineer with 5+ years of experience designing and scaling high-performance web applications across fintech, healthcare, and enterprise domains.</p>
+  <div>
+    <a href="#projects" class="btn">View my work</a>
+    <a href="#contact" class="btn ghost">Get in touch</a>
+  </div>
+</header>
+
+<section id="about" class="about">
+  <h2 class="section-title">About me</h2>
+  <div class="about-grid">
+    <div class="avatar">FS</div>
+    <div>
+      <p>I'm a Senior Software Engineer specializing in full-stack development with <strong>.NET, cloud-native architectures, and modern JavaScript frameworks</strong> (React, Vue, Angular).</p>
+      <p>I currently work remotely at <strong>Axxess (Cavista)</strong> in Dallas, Texas, where I build enterprise-grade healthcare applications. Previously, I optimized payment infrastructure at TeamApt (fintech) and built recruitment platforms at Genesys Tech Hub.</p>
+      <p>I'm a strong advocate for clean architecture, test-driven development, and continuous delivery — and I love mentoring engineers and translating business requirements into scalable technical solutions.</p>
+      <p>📍 Lagos, Nigeria &nbsp;·&nbsp; 🎓 B.Eng. Electrical & Electronics Engineering, FUTO (CGPA: 4.39/5.0)</p>
+    </div>
+  </div>
+</section>
+
+<section id="experience">
+  <h2 class="section-title">Experience</h2>
+  <div class="timeline">
+    <div class="job">
+      <div class="role">Senior Full-Stack Software Engineer</div>
+      <div class="company">AXXESS (Cavista) — Dallas, Texas, USA</div>
+      <div class="dates">June 2022 – Present · Remote</div>
+      <ul>
+        <li>Lead 20+ successful production releases with zero-downtime deployments</li>
+        <li>Delivered features that drove a 50% improvement in customer satisfaction</li>
+        <li>Built a .NET invoicing system with automated calculations and lifecycle tracking</li>
+        <li>Improved observability and operational efficiency by 50% through automation</li>
+      </ul>
+    </div>
+    <div class="job">
+      <div class="role">Frontend Engineer (Contract)</div>
+      <div class="company">Flashboord — Lagos, Nigeria</div>
+      <div class="dates">January 2024 – September 2025 · Remote</div>
+      <ul>
+        <li>Built scalable, reusable React.js components aligned with Figma design systems</li>
+        <li>Redesigned core user journeys (auth, dashboards, maps) improving usability</li>
+      </ul>
+    </div>
+    <div class="job">
+      <div class="role">Backend Engineer</div>
+      <div class="company">TeamApt — Lagos, Nigeria</div>
+      <div class="dates">August 2021 – April 2022 · Remote</div>
+      <ul>
+        <li>Optimized backend APIs, reducing payment processing time by 12% in high-volume fintech</li>
+        <li>Helped build a scalable payment gateway handling peak transaction loads</li>
+      </ul>
+    </div>
+    <div class="job">
+      <div class="role">.NET Software Engineer</div>
+      <div class="company">Genesys Tech Hub — Enugu, Nigeria</div>
+      <div class="dates">August 2020 – August 2021</div>
+      <ul>
+        <li>Built and deployed web apps with ASP.NET MVC 5, Web API, Angular, and SQL Server</li>
+        <li>Designed RESTful APIs that increased development efficiency by 25%</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="skills">
+  <h2 class="section-title">Skills</h2>
+
+  <div class="skill-group">
+    <h4>Languages & Frameworks</h4>
+    <div class="skills-list">
+      <span class="skill">C#</span><span class="skill">.NET Core</span><span class="skill">.NET Framework</span>
+      <span class="skill">ASP.NET MVC</span><span class="skill">ASP.NET Web API</span><span class="skill">JavaScript</span>
+      <span class="skill">TypeScript</span><span class="skill">Python</span><span class="skill">React.js</span>
+      <span class="skill">Vue.js</span><span class="skill">Angular</span><span class="skill">Aurelia</span>
+      <span class="skill">HTML5</span><span class="skill">CSS3</span><span class="skill">Bootstrap</span>
+    </div>
+  </div>
+
+  <div class="skill-group">
+    <h4>Architecture & Backend</h4>
+    <div class="skills-list">
+      <span class="skill">RESTful API Design</span><span class="skill">Entity Framework</span>
+      <span class="skill">Dependency Injection (IoC)</span><span class="skill">Microservices</span>
+      <span class="skill">Auth & Authorization Patterns</span>
+    </div>
+  </div>
+
+  <div class="skill-group">
+    <h4>Databases</h4>
+    <div class="skills-list">
+      <span class="skill">Microsoft SQL Server</span><span class="skill">MySQL</span>
+      <span class="skill">Query Optimization</span><span class="skill">Schema Design</span>
+    </div>
+  </div>
+
+  <div class="skill-group">
+    <h4>DevOps & Cloud</h4>
+    <div class="skills-list">
+      <span class="skill">Docker</span><span class="skill">GitHub Actions</span><span class="skill">Azure DevOps</span>
+      <span class="skill">CI/CD Pipelines</span><span class="skill">Azure (AZ-900)</span><span class="skill">Power Automate</span>
+    </div>
+  </div>
+
+  <div class="skill-group">
+    <h4>Testing, Monitoring & Methodologies</h4>
+    <div class="skills-list">
+      <span class="skill">xUnit</span><span class="skill">Unit & Integration Testing</span>
+      <span class="skill">Sentry</span><span class="skill">Kibana</span><span class="skill">Swagger</span>
+      <span class="skill">Postman</span><span class="skill">Agile (Scrum & Kanban)</span><span class="skill">Code Reviews</span>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <h2 class="section-title">Highlighted Work</h2>
+  <div class="projects-grid">
+    <div class="project-card">
+      <div class="emoji">🧾</div>
+      <h3>Enterprise Invoicing System</h3>
+      <p>A .NET-based invoicing platform with automated calculations, invoice generation, lifecycle tracking, and client notifications — built for mission-critical healthcare workflows at Axxess.</p>
+      <div class="tags"><span class="tag">.NET Core</span><span class="tag">SQL Server</span><span class="tag">Web API</span></div>
+    </div>
+    <div class="project-card">
+      <div class="emoji">💳</div>
+      <h3>Payment Gateway Optimization</h3>
+      <p>Contributed to a scalable payment gateway at TeamApt, optimizing backend APIs to cut payment processing time by 12% under high-volume fintech loads.</p>
+      <div class="tags"><span class="tag">C#</span><span class="tag">REST APIs</span><span class="tag">Fintech</span></div>
+    </div>
+    <div class="project-card">
+      <div class="emoji">🗂️</div>
+      <h3>Recruitment & Archiving Platform</h3>
+      <p>A job recruitment and document archiving web platform at Genesys Tech Hub, with reusable RESTful APIs that boosted development efficiency by 25%.</p>
+      <div class="tags"><span class="tag">ASP.NET MVC</span><span class="tag">Angular</span><span class="tag">SQL Server</span></div>
+    </div>
+    <div class="project-card">
+      <div class="emoji">🗺️</div>
+      <h3>Dashboard & Maps Redesign</h3>
+      <p>Redesigned core user journeys — authentication, dashboards, and maps — with scalable React.js components built strictly from Figma design systems.</p>
+      <div class="tags"><span class="tag">React.js</span><span class="tag">TypeScript</span><span class="tag">Figma</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="certifications">
+  <h2 class="section-title">Certifications</h2>
+  <div class="cert">
+    <div class="badge">☁️</div>
+    <div>
+      <strong>Microsoft Azure Fundamentals (AZ-900)</strong>
+      <span>Microsoft · July 2021</span>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <h2 class="section-title">Get in touch</h2>
+  <p>My inbox is always open — whether you have a project idea, a role to discuss, or just want to connect. I'll get back to you as soon as I can!</p>
+  <div class="socials">
+    <a href="mailto:franksolomonmarvelous@gmail.com">✉️ Email</a>
+    <a href="https://www.linkedin.com/in/marvelous-frank-solomon-189362109/" target="_blank">💼 LinkedIn</a>
+    <a href="tel:+2349036417646">📞 +234 903 641 7646</a>
+  </div>
+</section>
+
+<footer>© 2026 Frank Solomon Marvelous. Built with HTML & CSS.</footer>
+
+</body>
+</html>
