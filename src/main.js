@@ -1,5 +1,8 @@
 import './style.css';
 
+const savedTheme = localStorage.getItem('theme');
+document.documentElement.dataset.theme = savedTheme === 'dark' ? 'dark' : 'light';
+
 const experience = [
   {
     role: 'Senior Full-Stack Software Engineer',
@@ -74,7 +77,7 @@ app.innerHTML = `
       <a class="brand" href="#top" aria-label="Frank Solomon Marvelous home"><span>FSM</span><i></i></a>
       <button class="menu-toggle" aria-expanded="false" aria-controls="site-nav"><span></span><span></span><span></span><b class="sr-only">Toggle navigation</b></button>
       <nav id="site-nav" class="site-nav" aria-label="Primary navigation">
-        <a href="#about">About</a><a href="#experience">Experience</a><a href="#skills">Skills</a><a href="#work">Work</a><a href="#contact" class="nav-cta">Let's talk <span>↗</span></a>
+        <a href="#about">About</a><a href="#experience">Experience</a><a href="#skills">Skills</a><a href="#work">Work</a><a href="#contact" class="nav-cta">Let's talk <span>↗</span></a><button class="theme-toggle" type="button" aria-label="Switch to dark mode" title="Switch to dark mode"><span class="theme-icon" aria-hidden="true">☾</span></button>
       </nav>
     </header>
 
@@ -108,6 +111,25 @@ document.querySelector('#year').textContent = new Date().getFullYear();
 
 const menuToggle = document.querySelector('.menu-toggle');
 const nav = document.querySelector('#site-nav');
+const themeToggle = document.querySelector('.theme-toggle');
+const themeIcon = document.querySelector('.theme-icon');
+
+const updateThemeToggle = () => {
+  const isDark = document.documentElement.dataset.theme === 'dark';
+  const nextMode = isDark ? 'light' : 'dark';
+  themeToggle.setAttribute('aria-label', `Switch to ${nextMode} mode`);
+  themeToggle.setAttribute('title', `Switch to ${nextMode} mode`);
+  themeIcon.textContent = isDark ? '☼' : '☾';
+};
+
+themeToggle.addEventListener('click', () => {
+  const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = nextTheme;
+  localStorage.setItem('theme', nextTheme);
+  updateThemeToggle();
+});
+updateThemeToggle();
+
 menuToggle.addEventListener('click', () => {
   const isOpen = menuToggle.getAttribute('aria-expanded') === 'true';
   menuToggle.setAttribute('aria-expanded', String(!isOpen));
