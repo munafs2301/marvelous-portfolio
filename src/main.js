@@ -77,7 +77,7 @@ app.innerHTML = `
       <a class="brand" href="#top" aria-label="Frank Solomon Marvelous home"><span>FSM</span><i></i></a>
       <button class="menu-toggle" aria-expanded="false" aria-controls="site-nav"><span></span><span></span><span></span><b class="sr-only">Toggle navigation</b></button>
       <nav id="site-nav" class="site-nav" aria-label="Primary navigation">
-        <a href="#about">About</a><a href="#experience">Experience</a><a href="#skills">Skills</a><a href="#work">Work</a><a href="#contact" class="nav-cta">Let's talk <span>↗</span></a><button class="theme-toggle" type="button" aria-label="Switch to dark mode" title="Switch to dark mode"><span class="theme-icon" aria-hidden="true">☾</span></button>
+        <a href="#about">About</a><a href="#experience">Experience</a><a href="#skills">Skills</a><a href="#work">Work</a><a href="/system-design-interview-prep/">System Design Interview Prep</a><a href="#contact" class="nav-cta">Let's talk <span>↗</span></a><button class="theme-toggle" type="button" aria-label="Switch to dark mode" title="Switch to dark mode"><span class="theme-icon" aria-hidden="true">☾</span></button>
       </nav>
     </header>
 

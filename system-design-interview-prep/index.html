@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>System Design Interview Prep: 291 Questions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#EDF1F6; --surface:#FFFFFF; --surface2:#F5F8FB; --ink:#13263B; --muted:#52667C;
+  --line:#CAD6E3; --grid:rgba(27,77,214,.07); --accent:#1B4DD6; --accent-ink:#FFFFFF;
+  --known:#14805A; --e:#1E8A5A; --m:#B7791F; --h:#B4402F; --code:#E6EDF6; --shadow:0 1px 0 rgba(19,38,59,.04),0 6px 18px rgba(19,38,59,.07);
+  --serif:'Newsreader',Georgia,'Times New Roman',serif;
+  --sans:'Instrument Sans',system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0C1624; --surface:#13233A; --surface2:#101D31; --ink:#E4ECF6; --muted:#93A6BC;
+    --line:#263C58; --grid:rgba(120,160,255,.06); --accent:#6C9BFF; --accent-ink:#0C1624;
+    --known:#4CC38A; --e:#4CC38A; --m:#E2B04A; --h:#F2806F; --code:#1C3050; --shadow:0 1px 0 rgba(0,0,0,.2),0 8px 22px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0C1624; --surface:#13233A; --surface2:#101D31; --ink:#E4ECF6; --muted:#93A6BC;
+  --line:#263C58; --grid:rgba(120,160,255,.06); --accent:#6C9BFF; --accent-ink:#0C1624;
+  --known:#4CC38A; --e:#4CC38A; --m:#E2B04A; --h:#F2806F; --code:#1C3050; --shadow:0 1px 0 rgba(0,0,0,.2),0 8px 22px rgba(0,0,0,.35);
+}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 84px);-webkit-text-size-adjust:100%}
+*,*::before,*::after{box-sizing:inherit}
+body{
+  margin:0;font-family:var(--sans);color:var(--ink);line-height:1.5;
+  background-color:var(--bg);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:28px 28px;
+}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+code{font-family:var(--mono);font-size:.86em;background:var(--code);padding:.1em .38em;border-radius:4px;word-break:break-word}
+sup{font-size:.7em}
+
+/* top */
+.top{max-width:1240px;margin:0 auto;padding:28px 24px 12px;display:grid;gap:14px}
+.top h1{font-family:var(--serif);font-weight:500;font-size:clamp(1.7rem,3.4vw,2.5rem);line-height:1.12;margin:0;letter-spacing:-.01em}
+.top p{margin:0;color:var(--muted);max-width:62ch}
+.topbar{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+.overall{display:flex;align-items:center;gap:12px;min-width:240px;flex:1 1 280px;max-width:420px}
+.meter{flex:1;height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.meter>i{display:block;height:100%;width:0;background:var(--known);border-radius:99px}
+.overall span{font-size:.88rem;color:var(--muted);white-space:nowrap}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:6px;font-weight:500;font-size:.9rem;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;color:var(--ink);transition:border-color .16s ease, transform .16s ease, box-shadow .16s ease, background .16s ease}
+  .btn:hover{border-color:var(--accent);box-shadow:0 0 0 1px rgba(27,77,214,.1);transform:translateY(-1px)}
+  .btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+  .btn.small{padding:5px 10px;font-size:.82rem}
+  .home-link{margin-bottom:10px;align-self:flex-start;background:rgba(255,255,255,.4);backdrop-filter:blur(4px)}
+  .home-link:hover{background:var(--surface);}
+  .home-link .arrow{font-size:1.1rem;line-height:1}
+
+/* shell */
+.shell{max-width:1240px;margin:0 auto;padding:0 24px 64px;display:grid;grid-template-columns:292px minmax(0,1fr);gap:28px;align-items:start}
+#rail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);max-height:calc(100dvh - 24px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:8px;display:flex;flex-direction:column}
+#rail h2{font-size:.95rem;margin:0;padding:14px 16px 8px;font-weight:600}
+#topics{list-style:none;margin:0;padding:0 8px 8px}
+.t-item{display:block;width:100%;text-align:left;background:none;border:0;border-radius:6px;padding:9px 10px;position:relative}
+.t-item:hover{background:var(--surface2)}
+.t-item[aria-current="true"]{background:var(--surface2);box-shadow:inset 3px 0 0 var(--accent)}
+.t-row{display:flex;justify-content:space-between;gap:10px;font-size:.92rem}
+.t-row b{font-weight:500}
+.t-row small{color:var(--muted);white-space:nowrap}
+.t-bar{height:3px;border-radius:99px;background:var(--line);margin-top:6px;overflow:hidden}
+.t-bar i{display:block;height:100%;background:var(--known);width:0}
+.rail-foot{margin-top:auto;border-top:1px solid var(--line);padding:12px;display:grid;gap:8px;position:sticky;bottom:0;background:var(--surface)}
+.rail-foot .btn{width:100%}
+
+/* main */
+.scrim{display:none;position:fixed;inset:0;z-index:19;background:rgba(0,0,0,.4)}
+main{min-width:0}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding:12px 0;display:grid;gap:10px;border-bottom:1px solid var(--line);margin-bottom:18px}
+.bar .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.search{flex:1 1 220px;min-width:0;border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:9px 12px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--surface);padding:6px 12px;border-radius:99px;font-size:.84rem}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.sw{display:inline-flex;align-items:center;gap:8px;font-size:.86rem;color:var(--muted);user-select:none}
+.sw button{width:36px;height:20px;border-radius:99px;border:1px solid var(--line);background:var(--line);position:relative;padding:0}
+.sw button::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--surface);transition:transform .15s}
+.sw button[aria-checked="true"]{background:var(--accent);border-color:var(--accent)}
+.sw button[aria-checked="true"]::after{transform:translateX(16px)}
+.menu-btn{display:none}
+
+.head h2{font-family:var(--serif);font-weight:500;font-size:clamp(1.5rem,2.6vw,2rem);margin:0 0 4px;line-height:1.2}
+.head p{margin:0 0 14px;color:var(--muted);font-size:.92rem}
+
+.card{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:6px;margin-bottom:10px}
+.card.e{--c:var(--e)} .card.m{--c:var(--m)} .card.h{--c:var(--h)}
+.card.open{box-shadow:var(--shadow)}
+.qhead{width:100%;text-align:left;background:none;border:0;padding:14px 16px;display:grid;grid-template-columns:1fr auto;gap:4px 14px;align-items:start}
+.qtext{font-family:var(--serif);font-size:1.12rem;line-height:1.35;font-weight:500}
+.card.known .qtext{color:var(--muted)}
+.qmeta{display:flex;gap:10px;align-items:center;font-size:.78rem;color:var(--muted);white-space:nowrap;padding-top:3px}
+.lv{color:var(--c);font-weight:600}
+.tick{color:var(--known);font-weight:600}
+.from{grid-column:1/-1;font-size:.8rem;color:var(--muted)}
+.chev{display:inline-block;width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);margin-left:2px;margin-top:-3px}
+.card.open .chev{transform:rotate(-135deg);margin-top:4px}
+.body{padding:0 16px 16px}
+.body[hidden]{display:none}
+.answer{max-width:70ch}
+.answer p{margin:0 0 12px;line-height:1.65}
+.ex{border-left:3px solid var(--line);background:var(--surface2);padding:10px 14px;border-radius:0 6px 6px 0;max-width:70ch;font-size:.95rem;line-height:1.6}
+.ex b{display:block;font-size:.8rem;color:var(--muted);margin-bottom:2px;font-weight:600}
+.reveal{display:none;margin:2px 0 0}
+.quiz .card:not(.revealed) .answer{display:none}
+.quiz .card:not(.revealed) .reveal{display:block}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap}
+.known-btn{border:1px solid var(--line);background:var(--surface);padding:6px 12px;border-radius:6px;font-size:.86rem}
+.card.known .known-btn{background:var(--known);color:#fff;border-color:var(--known)}
+[data-theme="dark"] .card.known .known-btn{color:#0C1624}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .card.known .known-btn{color:#0C1624}}
+.empty{padding:36px 8px;color:var(--muted);text-align:center;border:1px dashed var(--line);border-radius:8px}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:20px;flex-wrap:wrap}
+
+/* drill */
+.drill{position:fixed;inset:0;z-index:30;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 16px) 16px calc(env(safe-area-inset-bottom,0px) + 16px)}
+.drill[hidden]{display:none}
+.dcard{width:100%;max-width:720px;max-height:100%;overflow:auto;background:var(--surface);border:1px solid var(--line);border-top:5px solid var(--c,var(--accent));border-radius:8px;padding:22px;box-shadow:var(--shadow)}
+.dcard.e{--c:var(--e)} .dcard.m{--c:var(--m)} .dcard.h{--c:var(--h)}
+.dtop{display:flex;justify-content:space-between;gap:10px;font-size:.85rem;color:var(--muted);margin-bottom:12px;align-items:center}
+.dq{font-family:var(--serif);font-size:clamp(1.3rem,3vw,1.7rem);line-height:1.3;margin:0 0 18px;font-weight:500}
+.dbtns{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.dsum{text-align:center;padding:10px 0}
+.dsum h3{font-family:var(--serif);font-size:1.6rem;margin:0 0 6px;font-weight:500}
+
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr;padding:0 16px 56px}
+  .top{padding:20px 16px 8px}
+  #rail{position:fixed;z-index:20;left:0;top:0;bottom:0;width:min(86vw,340px);max-height:none;border-radius:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);transform:translateX(-102%);transition:transform .2s}
+  body.rail-open #rail{transform:none}
+  body.rail-open .scrim{display:block}
+  .menu-btn{display:inline-block}
+  .bar{position:static}
+  html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 12px)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="actions" style="justify-content:flex-start; margin-bottom: 8px;">
+    <a class="btn home-link" href="/" aria-label="Back to home page"><span class="arrow">←</span> Back to home</a>
+  </div>
+  <h1>System design interview prep</h1>
+  <p>Questions and worked answers for every topic in the System Design for Beginners guide, each with a concrete example. Open a card to read the answer, or switch on quiz mode and try answering first.</p>
+  <div class="topbar">
+    <div class="overall" aria-live="polite"><div class="meter"><i id="overallBar"></i></div><span id="overallTxt"></span></div>
+    <div class="actions">
+      <button class="btn primary" id="drillTopic">Drill this topic</button>
+      <button class="btn" id="themeBtn">Dark mode</button>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+  <aside id="rail" aria-label="Topics">
+    <h2>26 topics</h2>
+    <ul id="topics"></ul>
+    <div class="rail-foot">
+      <button class="btn" id="drillAll">Drill all unknown questions</button>
+      <button class="btn small" id="resetBtn">Reset progress</button>
+    </div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main>
+    <div class="bar">
+      <div class="row">
+        <button class="btn menu-btn" id="menuBtn" aria-controls="rail">Topics</button>
+        <input class="search" id="search" type="search" placeholder="Search all 291 questions" aria-label="Search questions">
+      </div>
+      <div class="row">
+        <div class="chips" role="group" aria-label="Difficulty">
+          <button class="chip" data-lvl="all" aria-pressed="true">All levels</button>
+          <button class="chip" data-lvl="e" aria-pressed="false"><span class="dot" style="background:var(--e)"></span>Easy</button>
+          <button class="chip" data-lvl="m" aria-pressed="false"><span class="dot" style="background:var(--m)"></span>Medium</button>
+          <button class="chip" data-lvl="h" aria-pressed="false"><span class="dot" style="background:var(--h)"></span>Hard</button>
+        </div>
+        <span class="sw"><button role="switch" aria-checked="false" id="quizSw" aria-labelledby="quizLbl"></button><span id="quizLbl">Quiz mode</span></span>
+        <span class="sw"><button role="switch" aria-checked="false" id="hideSw" aria-labelledby="hideLbl"></button><span id="hideLbl">Hide known</span></span>
+        <button class="btn small" id="expandBtn">Expand all</button>
+        <button class="btn small" id="collapseBtn">Collapse all</button>
+      </div>
+    </div>
+    <div class="head"><h2 id="topicTitle"></h2><p id="topicMeta"></p></div>
+    <div id="list"></div>
+    <div class="nav" id="nav"></div>
+  </main>
+</div>
+
+<div class="drill" id="drill" hidden role="dialog" aria-modal="true" aria-label="Flashcard drill"></div>
+
+<footer style="max-width: 1240px; margin: 0 auto; padding: 0 24px 40px;">
+  <a class="btn small home-link" href="/" aria-label="Return to the portfolio homepage"><span class="arrow">←</span> Back to home</a>
+</footer>
+
+<script>
+const T=[];
+T.push({t:`Why study system design?`,q:[
+['e',`Why do we need to study system design if a simple backend plus a database already works for my project?`,
+`A simple client → backend → database setup is fine for prototypes and personal projects. With millions of real users it breaks: one server chokes, one database slows down, and one crash takes everything down. System design is the toolkit for handling scale, fault tolerance, security and monitoring so the system stays reliable.`,
+`A college project with NodeJS + MongoDB serves 50 users happily. On launch day with 500,000 users, the single server hits 100% CPU and the site goes down.`],
+['e',`What does the "client" box mean in a system design diagram?`,
+`A client is anything a normal person uses to talk to your system: a ReactJS web app, an Android or iOS app, or a browser. The diagram only cares that it sends requests and receives responses.`,
+`In a WhatsApp design, the "client" box covers the Android app, the iOS app and WhatsApp Web alike.`],
+['e',`What goes wrong with the basic one-server architecture when real traffic arrives?`,
+`The server's CPU, RAM and connections become the bottleneck, the single database slows down, and there is a single point of failure. Latency rises and, eventually, requests fail.`,
+`A flash sale sends 100,000 requests in a minute to one 4-core machine. Response time goes from 100 ms to 30 s, then requests time out.`],
+['m',`Which qualities does a production system need beyond "it returns the right answer"?`,
+`Scalability (handle growth), fault tolerance (survive failures), security, monitoring and efficiency. System design concepts exist to deliver these in all cases, not only on the happy path.`,
+`An e-commerce site must keep working when one payment server crashes (fault tolerance), alert engineers when latency spikes (monitoring), and handle Black Friday (scalability).`],
+['m',`What is a single point of failure (SPOF), and how do the concepts in system design remove it?`,
+`A SPOF is a component whose failure takes down the whole system. You remove it with redundancy: several app servers behind a load balancer, database replicas, multiple orchestrators, and microservices so one crash stays isolated.`,
+`One database server holds all orders. If its disk dies, the store stops. A replica that is promoted automatically removes the SPOF.`],
+['m',`What is over-engineering in system design? Give an example.`,
+`Building for a scale you do not need. You scale step by step and only as far as the business requires, because every extra component adds cost and complexity.`,
+`A startup with 10,000 users sharding its database across 10 servers wastes money and adds cross-shard join pain. Indexing plus vertical scaling is enough.`],
+['m',`How do you decide how far to scale a system?`,
+`Estimate the load (DAU, requests per second, storage), compare it with what one machine can do, and add the simplest technique that closes the gap. Move to the next, more complex technique only when the current one is exhausted.`,
+`Slow reads → add an index → still slow → cache → still slow → read replicas → writes now bottleneck → consider sharding.`],
+['e',`What is the difference between a prototype architecture and a production architecture?`,
+`A prototype optimises for speed of building, with one server and one database. Production optimises for reliability at scale, adding load balancers, caches, replicas, queues, monitoring and automated recovery.`,
+`Prototype: Express app + Postgres on one VM. Production: 20 app instances behind a load balancer, Redis cache, primary + replica DB, S3 + CDN for media.`],
+['m',`What is the difference between high-level design (HLD) and low-level design (LLD)?`,
+`HLD decides the big building blocks and how they talk: services, databases, caches, queues, load balancers. LLD goes inside one component: classes, schemas, APIs and algorithms. System design interviews are mostly HLD.`,
+`HLD: "Use Kafka between the Order Service and the Notification Service." LLD: "The Notification class has a retry() method with exponential backoff."`],
+['h',`How should you talk about trade-offs in a system design interview?`,
+`Every choice gains something and costs something. State the choice, the benefit, the cost, and why the benefit wins for this requirement. Interviewers look for reasoning, not a single right answer.`,
+`"I choose eventual consistency for like counts: it gives higher availability and lower latency, and showing 1,203 instead of 1,205 for a few seconds is acceptable. For account balances I would choose strong consistency."`]
+]});
+
+T.push({t:`What is a server?`,q:[
+['e',`What is a server?`,
+`A server is a machine (physical or virtual) that runs your application code and answers requests from clients. Your laptop running a NodeJS app is technically a server too, just not one the internet can reach.`,
+`Running <code>npm start</code> on your laptop makes it a server listening on <code>localhost:8080</code>.`],
+['e',`What is <code>localhost</code>, and what IP address does it map to?`,
+`<code>localhost</code> is a domain name that resolves to <code>127.0.0.1</code>, the address of your own machine. Only your own computer can reach it.`,
+`A React dev server at <code>http://localhost:3000</code> cannot be opened by your friend on another network.`],
+['e',`What happens when you type <code>https://abc.com</code> in a browser?`,
+`1) The browser asks a DNS resolver for the IP address of <code>abc.com</code>. 2) It sends the request to that IP. 3) The server uses the port to pick the right application and returns the response.`,
+`<code>abc.com</code> → DNS → <code>35.154.33.64</code> → port 443 → the HTTPS app replies with the page.`],
+['e',`What is DNS and why do we need it?`,
+`The Domain Name Service maps human-friendly domain names to IP addresses. Remembering IPs is hard, so people buy a domain and point it at their server's IP.`,
+`You buy <code>myshop.com</code> and add a DNS record pointing to your EC2 instance's public IP. Users never type the number.`],
+['e',`What is an IP address and what is a port? Why do we need both?`,
+`An IP address identifies a device on the network and is unique per device. A port identifies which application on that device should receive the request, because many apps run on one server.`,
+`<code>35.154.33.64:443</code> means "machine 35.154.33.64, the app listening on 443 (HTTPS)". Port 80 is the default for HTTP.`],
+['e',`What does the default port 443 mean?`,
+`443 is the default port for HTTPS. Browsers add it automatically, so <code>https://abc.com</code> is the same as <code>abc.com:443</code>.`,
+`Requesting <code>https://abc.com</code> equals requesting <code>35.154.33.64:443</code>.`],
+['m',`How do you make an app that runs on your laptop's port 8080 reachable from the internet?`,
+`You need a public IP address attached to the machine so others can call <code>https://&lt;public-ip&gt;:8080</code>. Managing that yourself (uptime, power, networking) is painful, so people rent servers from cloud providers.`,
+`Instead of exposing a home laptop, you rent an AWS EC2 instance, which already has a public IP.`],
+['e',`Why rent servers from cloud providers like AWS, Azure or GCP instead of running your own?`,
+`The provider gives you a virtual machine with a public IP, handles hardware, power and networking, and lets you pay as you go and scale up or down quickly.`,
+`Launching an EC2 instance takes minutes. Buying and hosting a physical server takes weeks.`],
+['e',`What is an EC2 instance and what does "deployment" mean?`,
+`An EC2 instance is AWS's name for a virtual machine. Deployment is moving your application code from your laptop onto that machine so it runs and serves users.`,
+`SSH into EC2, pull your repo, run <code>npm start</code>, open port 80 or 443 in the security group: the app is deployed.`],
+['m',`If many applications run on one server, how does the server know which one should handle a request?`,
+`By the port number in the request. Each application listens on its own port, and the operating system routes incoming traffic to the matching process.`,
+`On one machine: the web app on 443, an admin dashboard on 8081, a database on 5432. A request to port 8081 goes to the dashboard.`],
+['m',`Why can't a client simply be given the IP of every server when you run many servers?`,
+`Clients are not smart enough to choose a healthy or idle server, and server IPs change. A single entry point (domain → load balancer) hides the fleet and makes the choice for them.`,
+`Users always visit <code>abc.com</code>; behind it, ten servers may come and go without anyone noticing.`]
+]});
+
+T.push({t:`Latency and throughput`,q:[
+['e',`What is latency?`,
+`Latency is the time one request takes to go from client to server and back, or one unit of work to complete. It is usually measured in milliseconds. Lower is better.`,
+`A page whose data returns in 200 ms has 200 ms latency.`],
+['e',`What is throughput?`,
+`Throughput is how much work the system completes per unit of time, such as requests per second (RPS) or transactions per second (TPS). Every server has a limit, and pushing beyond it makes it choke.`,
+`One API server that can serve 2,000 requests per second has a throughput of 2,000 RPS.`],
+['e',`What is Round Trip Time (RTT)?`,
+`RTT is the total time for a request to reach the server and the response to return. People sometimes use the word interchangeably with latency.`,
+`If a request takes 40 ms to reach a server and 40 ms to come back, RTT = 80 ms.`],
+['e',`Explain latency vs throughput with an analogy.`,
+`Think of a highway. Latency is how long one car takes to travel from A to B. Throughput is how many cars pass per hour.`,
+`One car takes 10 minutes (latency) and the highway carries 1,000 cars per hour (throughput).`],
+['m',`What do we want in an ideal system?`,
+`Low latency and high throughput together: each request is fast and many can be handled at once.`,
+`A search service answering in 50 ms at 20,000 RPS meets both goals.`],
+['m',`Can a system have high throughput but also high latency?`,
+`Yes. They are separate measures. A batch pipeline can process millions of records per hour (high throughput) while each record takes minutes to finish (high latency).`,
+`A video transcoding farm completes thousands of videos per day, but each video takes 20 minutes.`],
+['m',`How can you reduce latency?`,
+`Serve data from something faster or closer: caching (Redis), CDNs for static files, database indexes, nearby regions, and doing slow work asynchronously instead of making the user wait.`,
+`Caching a 600 ms blog query in Redis drops the response to about 20 ms.`],
+['m',`How can you increase throughput?`,
+`Add capacity or reduce work per request: horizontal scaling with a load balancer, caching, async processing with queues, batching writes and read replicas.`,
+`Going from 1 to 5 identical servers behind a load balancer raises capacity from 2,000 to roughly 10,000 RPS.`],
+['m',`What happens when requests exceed a server's throughput limit?`,
+`Queues build up, latency rises, requests time out or fail, and the server may crash. You respond with scaling, rate limiting, load shedding or buffering with a queue.`,
+`A server rated for 1,000 RPS gets 3,000 RPS: response times climb from 100 ms to several seconds, then errors appear.`],
+['h',`For a live video call app versus a nightly report generator, which metric matters more?`,
+`The video call cares most about low latency because delay is felt immediately. The report generator cares more about throughput because the total work finished per night matters, not how fast one row is processed.`,
+`A 500 ms delay ruins a call. A report that takes 2 hours instead of 1 hour is usually fine.`]
+]});
+
+T.push({t:`Scaling and its types`,q:[
+['e',`What is scaling and why is it needed?`,
+`Scaling means increasing a system's capacity by upgrading machine specs or adding more machines, so it keeps working as load grows. Without it, sudden traffic crashes the site.`,
+`A product goes viral on social media. Traffic jumps 20x and an unscaled site goes down.`],
+['e',`What is vertical scaling?`,
+`Increasing the resources (CPU, RAM, storage) of the same machine. Also called scale up or down.`,
+`Moving from a 4 GB / 2-core instance to a 64 GB / 16-core instance.`],
+['e',`What is horizontal scaling?`,
+`Adding more machines and distributing the load across them. Also called scale out or in.`,
+`Instead of one big server, run five medium servers behind a load balancer.`],
+['m',`Why can't we rely on vertical scaling alone?`,
+`There is a hard ceiling: you cannot add unlimited RAM or CPU to one machine, and a bigger machine is still a single point of failure. Past a point you must scale horizontally.`,
+`Even the largest cloud instance has a maximum size. When you hit it, the only option is more machines.`],
+['m',`When is vertical scaling the better choice?`,
+`When the system is stateful, or hard to distribute: SQL databases and stateful applications where keeping state consistent across machines is difficult. It is also the simplest option, so try it first.`,
+`A single PostgreSQL primary is first upgraded to a larger instance before anyone considers sharding.`],
+['m',`Why do we need a load balancer in horizontal scaling?`,
+`Clients cannot be told which of many servers to call. A load balancer is the single entry point: it receives all requests and forwards each to a suitable (for example, least busy) server.`,
+`8 clients and 2 machines: the load balancer sends about 4 clients to each machine, without clients knowing there are two.`],
+['m',`Compare vertical and horizontal scaling.`,
+`<b>Vertical:</b> simple, no code changes, limited ceiling, single point of failure. <b>Horizontal:</b> nearly unlimited, fault tolerant, but needs a load balancer and brings coordination and consistency challenges.`,
+`Web servers: scale horizontally. A relational database primary: scale vertically first.`],
+['m',`Which type of scaling is most common in the real world?`,
+`Horizontal scaling, because it removes the hardware ceiling and improves fault tolerance, usually combined with vertical scaling for stateful pieces like databases.`,
+`Stateless API tier: 50 small instances. Database primary: one large instance plus replicas.`],
+['m',`What is the difference between stateless and stateful servers, and why does it matter for scaling?`,
+`A stateless server keeps no important data between requests, so any instance can serve any request and scaling out is easy. A stateful server holds data, so scaling out requires replication or partitioning and consistency becomes a concern.`,
+`A stateless API server can be cloned freely. A database node cannot, because each copy needs the same data.`],
+['h',`Your API gets 10x traffic. Walk through how you would scale it.`,
+`Measure the bottleneck first. If the app tier is stateless, add instances behind a load balancer (ideally with auto scaling). Cache hot reads, then address the database with indexes, read replicas and only later sharding.`,
+`Add 10 API instances + LB, cache product pages in Redis, add two read replicas, and keep writes on one primary.`]
+]});
+
+T.push({t:`Auto scaling`,q:[
+['e',`What is auto scaling?`,
+`Automatically changing the number of servers based on traffic, so you run only what you need without manual intervention.`,
+`When CPU on the fleet crosses 90%, launch another instance and register it with the load balancer.`],
+['e',`Why not just run the maximum number of servers all the time?`,
+`Because you pay for idle machines during low traffic. Auto scaling matches capacity to demand and saves money while still surviving spikes.`,
+`Peak needs 100 instances but a normal day needs 10. Running 100 all the time wastes the cost of 90 instances.`],
+['m',`Show a quick capacity calculation that motivates auto scaling.`,
+`If one instance serves 1,000 users: 10,000 users need 10 instances, 100,000 users need 100 instances. Fixed provisioning must pay for 100 always, while auto scaling follows the traffic.`,
+`Quiet day: 10 instances. Sale day: 100 instances. Auto scaling goes 10 → 100 → back to 10 on its own.`],
+['m',`What triggers an auto scaling action?`,
+`A metric crossing a threshold, such as CPU utilisation, memory, request count per instance or queue length. When exceeded, the group scales out. When it falls well below, it scales in.`,
+`Rule: if average CPU &gt; 90% for 5 minutes, add one instance. If &lt; 30%, remove one.`],
+['m',`How do you choose the right threshold?`,
+`Through load testing: push traffic at an instance until it degrades, then set the trigger safely below that point. The numbers in textbooks are hypothetical.`,
+`Load test shows an instance degrades at 1,000 concurrent users, so you scale out at roughly 70–80% of that.`],
+['m',`What infrastructure must sit in front of auto-scaled servers?`,
+`A load balancer. New instances must be registered automatically and receive traffic, and terminated instances must stop receiving it.`,
+`An AWS Auto Scaling Group attached to an Application Load Balancer target group.`],
+['m',`What is the difference between scale out and scale in?`,
+`Scale out adds instances when load rises. Scale in removes instances when load falls. Together they are horizontal auto scaling.`,
+`Morning: scale out from 10 to 25 instances. Night: scale in back to 10.`],
+['m',`Why do we set minimum and maximum limits on an auto scaling group?`,
+`The minimum keeps enough capacity for baseline traffic and availability. The maximum caps cost and protects you from runaway scaling due to bugs or attacks.`,
+`Min = 4 (always survive the loss of a node), Max = 100 (budget ceiling).`],
+['h',`Why is auto scaling easier for stateless apps than for stateful ones?`,
+`New instances of a stateless app can start serving immediately. A stateful node needs data copied or rebalanced before it is useful, and removing it risks losing data.`,
+`Add an API server: ready in a minute. Add a database node: must sync terabytes first.`],
+['h',`What can go wrong with auto scaling, and how do you mitigate it?`,
+`Slow instance startup (spikes outpace scaling), flapping (scale out and in repeatedly), and downstream bottlenecks (the database cannot take the extra load). Mitigate with warm pools or pre-scaling, cooldown periods, and by scaling the database tier or caching too.`,
+`Doubling API servers does not help if all of them hammer one database. Add caching and replicas as well.`]
+]});
+
+T.push({t:`Back-of-the-envelope estimation`,q:[
+['e',`What is back-of-the-envelope estimation and why do we do it?`,
+`A quick approximate calculation of load, storage and servers needed. It tells you whether one machine is enough or whether you need scaling, sharding or caching.`,
+`Estimating 1 billion writes per day tells you immediately that a single database will not cope.`],
+['e',`How much time should you spend on estimation in an interview?`,
+`About 5 minutes, no more. Round numbers aggressively to keep the math easy.`,
+`Use 1,000 bytes instead of 500, and 100,000 seconds per day instead of 86,400.`],
+['e',`Recite the powers-of-2 / data size table.`,
+`2<sup>10</sup> ≈ 1 thousand (KB), 2<sup>20</sup> ≈ 1 million (MB), 2<sup>30</sup> ≈ 1 billion (GB), 2<sup>40</sup> ≈ 1 trillion (TB), 2<sup>50</sup> ≈ 1 quadrillion (PB).`,
+`1 billion bytes ≈ 1 GB. 1 million MB ≈ 1 TB.`],
+['e',`Which three things does the article suggest estimating?`,
+`Load (reads and writes), storage, and resources (CPUs and servers).`,
+`Twitter: tweets per day, bytes per day, then cores and machines needed.`],
+['m',`How do you do load estimation? Use the Twitter example.`,
+`Ask for DAU, then compute writes and reads per day. With 100 million DAU and 10 tweets per user per day, writes = 1 billion tweets/day. If each user reads 1,000 tweets, reads = 100 billion/day.`,
+`1 billion / 100,000 s ≈ 10,000 writes/s, and 100 billion / 100,000 s ≈ 1 million reads/s. This is read-heavy, which suggests caching.`],
+['m',`How do you do storage estimation for Twitter?`,
+`A tweet is 200 characters × 2 bytes = 400 bytes ≈ 500 bytes. Text for 1 billion tweets/day ≈ 500 GB to 1 TB. If 10% have a 2 MB photo, that is 100 million × 2 MB = 200 TB (the article rounds up to about 1 PB). Photos dominate storage.`,
+`Insight: store photos in blob storage (S3) with a CDN, not in the database.`],
+['m',`How do you estimate the number of servers needed?`,
+`Total CPU time per second ÷ CPU time one core gives per second = cores. Divide by cores per server for servers. 10,000 RPS × 10 ms = 100,000 ms of CPU per second. One core gives 1,000 ms/s, so 100 cores. With 4 cores per server, that is 25 servers.`,
+`Plan 25 servers behind a load balancer (plus headroom for failures and spikes).`],
+['m',`Why do we compute the read-to-write ratio?`,
+`It guides the design. Read-heavy systems benefit from caching and read replicas. Write-heavy systems need sharding, queues or Kafka to absorb writes.`,
+`Twitter at 100:1 reads to writes → cache aggressively and add read replicas.`],
+['m',`What should you ask the interviewer before estimating?`,
+`Daily active users, how often each user performs each action, average object size, how long data is retained, and any peak-to-average traffic ratio.`,
+`"Do we expect 100 million DAU? Roughly how many photos per tweet? Do we keep data for 5 years?"`],
+['h',`Estimate storage for a URL shortener that creates 100 million new URLs per day, kept for 5 years.`,
+`100 million/day × 365 × 5 ≈ 180 billion URLs. At about 500 bytes each (short code, long URL, metadata) that is about 90 TB. That fits across a few sharded database nodes, and the read path should be cached.`,
+`Rounded: 100M × 400 days × 5 ≈ 200B rows × 500 B = 100 TB.`],
+['h',`Why is rounding acceptable in estimation, and where must you be careful?`,
+`The goal is order of magnitude (GB vs TB vs PB), which decides architecture. Be careful not to round away a factor that changes the conclusion, and always state your assumptions so the interviewer can adjust them.`,
+`500 bytes vs 1,000 bytes does not change the design. 1 TB vs 1 PB does.`]
+]});
+
+T.push({t:`CAP theorem`,q:[
+['e',`What does the CAP theorem state?`,
+`In a distributed system you can guarantee only two of three properties at once: Consistency, Availability and Partition tolerance. All three together is impossible.`,
+`A multi-region database must choose, during a network failure, between rejecting some requests (consistent) or answering with possibly stale data (available).`],
+['e',`What is a distributed system, and what is a node?`,
+`A distributed system stores data and does work across multiple servers instead of one. Each individual server in it is a node. Data is replicated across nodes for performance and nearer access.`,
+`The same data is replicated in database nodes in Mumbai, Delhi and Chennai.`],
+['e',`Define Consistency in CAP.`,
+`Every read returns the same result no matter which node serves it, because all nodes have the same data at the same time.`,
+`A user updates their profile photo. Whether the next read hits node A, B or C, they see the new photo.`],
+['e',`Define Availability in CAP.`,
+`The system keeps responding to requests even if some nodes fail, using the healthy ones.`,
+`Node B has a hardware failure. Nodes A and C keep serving traffic.`],
+['e',`Define Partition Tolerance in CAP.`,
+`The system keeps operating even when the network between nodes breaks, so some nodes cannot talk to others.`,
+`A network cut separates node B from A and C. B can still serve its users, but cannot sync with A and C.`],
+['m',`What is the difference between availability and partition tolerance?`,
+`Availability is about continuing to serve when nodes fail. Partition tolerance is about continuing to serve when the network between nodes fails. A node can be healthy but unreachable.`,
+`Availability: server B crashes. Partition: B is fine, but the link to A and C is cut.`],
+['m',`Why can't we have all three of C, A and P?`,
+`During a partition, a node cannot be sure it has the latest data. If it keeps answering (availability), different users may see different values (loses consistency). If it refuses to answer until it can sync (consistency), it loses availability.`,
+`Partition isolates B. Serve from B: possibly stale (AP). Stop B: consistent but unavailable (CP).`],
+['m',`Why do distributed systems effectively choose between CP and AP and not CA?`,
+`Network partitions are bound to happen in any real distributed system, so partition tolerance is a given. CA only makes sense if partitions never occur, which is not practical.`,
+`Cables are cut and routers fail. Design as if partitions will happen.`],
+['m',`When would you choose CP, and when AP?`,
+`Choose CP when wrong data is unacceptable: banking, payments, stock trading. Choose AP when being up matters more than perfect freshness: social media feeds, like counts, product catalogues.`,
+`Bank balance: CP. Like count on a post: AP.`],
+['m',`How would you explain CAP using three nodes A, B and C?`,
+`Consistency: an update on B propagates to A and C. Availability: if B dies, A and C still serve. Partition tolerance: if B is cut off from A and C, the system keeps functioning in some form. During the cut you must choose between serving B's possibly stale users or pausing B.`,
+`Choosing availability: B accepts a write that A and C do not see until the partition heals.`],
+['h',`Is Redis or MongoDB "CP" or "AP"? Is it that simple?`,
+`Classifications depend on configuration. Many databases let you tune consistency per operation (for example quorum settings), so a system can lean CP for some reads and AP for others. Always check what your chosen database provides.`,
+`DynamoDB supports eventually consistent reads (AP-leaning) and strongly consistent reads (CP-leaning).`],
+['h',`How does CAP relate to eventual consistency?`,
+`Choosing availability during partitions means replicas may temporarily diverge. Eventual consistency guarantees they converge once communication resumes, with conflict resolution if needed.`,
+`Two replicas accepted different values during a partition. After healing, the system merges them (for example last-write-wins).`]
+]});
+
+T.push({t:`Scaling of databases`,q:[
+['e',`In what order should you scale a database?`,
+`Step by step, only as far as needed: indexing, then vertical scaling, partitioning, master-slave (read replicas) for read-heavy load, multi-master for heavy writes, and sharding as a last resort. Always prefer vertical scaling first because it is easy.`,
+`Slow query → add an index → upgrade the instance → add read replicas → shard only at very large scale.`],
+['e',`What is indexing and how does it speed up reads?`,
+`Without an index the database does a full table scan, checking every row in O(N). An index keeps a copy of the column in a sorted structure (B-tree), so lookup is about O(log N).`,
+`<code>SELECT * FROM users WHERE id = 4</code> on 100 million rows: a scan reads all rows, a B-tree jumps to the row in about 27 steps.`],
+['m',`What is the downside of indexing?`,
+`Indexes use extra storage and slow down writes, because every insert, update or delete must also update the index. Index the columns you filter or join on, not everything.`,
+`Ten indexes on one table make inserts noticeably slower.`],
+['e',`What is partitioning?`,
+`Breaking one large table into several smaller tables inside the same database server. Each has its own, smaller index.`,
+`<code>users</code> is split into <code>user_table_1</code>, <code>user_table_2</code>, <code>user_table_3</code> on one server.`],
+['m',`What is the benefit of partitioning?`,
+`A huge index becomes slow to search. After partitioning, each partition has a smaller index, so searches are faster. Databases such as PostgreSQL route the query to the right partition for you.`,
+`<code>WHERE id = 4</code> only touches the partition that holds id 4.`],
+['e',`What is the master-slave (primary-replica) architecture?`,
+`Data is replicated to multiple servers. All writes go to one master. Reads are spread across slave nodes (replicas). Writes replicate from the master to slaves, synchronously or asynchronously.`,
+`1 master handles INSERT/UPDATE/DELETE. 4 replicas handle SELECT queries.`],
+['m',`When do you use master-slave replication?`,
+`When read traffic is high and indexing, partitioning and vertical scaling are no longer enough, but the write load still fits on one machine.`,
+`A news site with 100 reads per write adds replicas to spread the reads.`],
+['m',`What problem can asynchronous replication cause?`,
+`Replication lag: a replica may briefly return stale data after a write. Synchronous replication avoids this but makes writes slower and less available.`,
+`User posts a comment and refreshes. The read hits a lagging replica and the comment is missing for a second.`],
+['m',`What is a multi-master setup and when is it used?`,
+`Several master databases accept writes and sync with each other. Use it when a single master cannot handle the write load or when you need regional write locality.`,
+`One master for North India, another for South India, periodically syncing.`],
+['h',`What is the hardest problem in multi-master and how do you handle it?`,
+`Write conflicts: the same record is changed differently on two masters. There is no universal rule, so you define one by business logic: last write wins, merge values, keep both, or ask the user.`,
+`Two masters update the same user's address at once. Choose the latest timestamp, or flag it for review.`],
+['e',`What is database sharding?`,
+`Like partitioning, but the pieces are stored on different servers (shards). It scales storage and writes beyond a single machine.`,
+`Users 1–1,000 on DB-1, 1,001–2,000 on DB-2, 2,001–3,000 on DB-3.`],
+['m',`What is a sharding key and what makes a good one?`,
+`The column used to decide which shard holds a row, such as <code>user_id</code>. A good key spreads data and traffic evenly to avoid overloading one shard.`,
+`Sharding by <code>country</code> is risky if 60% of users are in one country. <code>user_id</code> hashed distributes evenly.`],
+['m',`Explain the four sharding strategies.`,
+`<b>Range-based:</b> split by value ranges (simple, but skew). <b>Hash-based:</b> <code>hash(key) % N</code> (even, but rebalancing is hard). <b>Geographic/entity-based:</b> by region or department (local, but hotspots). <b>Directory-based:</b> a lookup table maps keys to shards (flexible, but the directory can bottleneck).`,
+`Directory: a table says user 5,000 → shard 3, so you can move users without changing app logic.`],
+['m',`Why is sharding difficult compared with partitioning?`,
+`With partitioning, the database routes queries for you. With sharding, the application must decide which shard to read or write, and handle adding records, moving data and rebalancing.`,
+`App code: <code>shard = hash(userId) % 3</code>, then connect to that DB server.`],
+['m',`What are the disadvantages of sharding?`,
+`It is hard to implement, cross-shard joins are expensive because data is pulled from many servers, and consistency is harder across servers. Avoid it until simpler options are exhausted.`,
+`Joining <code>orders</code> and <code>users</code> that live on different shards needs data pulled together in the application.`],
+['h',`Summarise the rules for choosing a database scaling technique.`,
+`Prefer vertical scaling first. For read-heavy traffic use master-slave. For write-heavy traffic or data that no longer fits on one machine, shard and try to avoid cross-shard queries. If replicas cannot keep up even for reads, sharding may be needed at very large scale.`,
+`Social feed reads: replicas + cache. Messaging writes: shard by conversation or user.`]
+]});
+
+T.push({t:`SQL vs NoSQL`,q:[
+['e',`What are the main characteristics of SQL databases?`,
+`Data is stored in tables with a predefined schema, relationships and joins, and they follow ACID properties for integrity and reliability.`,
+`MySQL, PostgreSQL, Oracle, SQL Server, SQLite.`],
+['e',`What does ACID stand for?`,
+`Atomicity (all or nothing), Consistency (data stays valid), Isolation (concurrent transactions do not interfere) and Durability (committed data survives crashes).`,
+`Transferring ₹500 from A to B: both the debit and the credit happen, or neither does.`],
+['e',`What are the four types of NoSQL databases?`,
+`Document (MongoDB), key-value (Redis, DynamoDB), column-family (Cassandra) and graph (Neo4j).`,
+`Document: a product with variable attributes. Graph: friends of friends.`],
+['m',`What is a flexible schema and why does it matter?`,
+`In NoSQL you can add new fields without migrating the whole structure. That suits unstructured or evolving data.`,
+`Reviews can have a rating, text, photos, tags; you add a "verified purchase" field without altering older records.`],
+['m',`How do SQL and NoSQL typically scale?`,
+`SQL is designed primarily to scale vertically. NoSQL is designed to scale horizontally by adding nodes, and sharding is common there.`,
+`Cassandra adds nodes to a ring as data grows.`],
+['m',`Why do we usually avoid sharding SQL databases?`,
+`We pick SQL for ACID and joins. Across shards, consistency is hard to maintain and joins across servers become complex and expensive. It can be done, but only when necessary.`,
+`A cross-shard transaction between two bank accounts on different shards needs complex coordination.`],
+['m',`When should you choose SQL?`,
+`When data is structured with a fixed schema, when integrity and consistency matter (payments, balances, orders, stock trading), and when you need complex queries, joins and aggregations such as analytics.`,
+`Customer accounts, orders and payments of an e-commerce app.`],
+['m',`When should you choose NoSQL?`,
+`When data is unstructured or the schema changes, when you need high availability, horizontal scalability and low latency at huge volume.`,
+`Posts, likes, comments, messages, and delivery driver locations in real time.`],
+['m',`Which database would you pick for e-commerce reviews, and which for payments?`,
+`Reviews and recommendations: NoSQL, because they are flexible and numerous. Payments and orders: SQL, because they need ACID guarantees.`,
+`Reviews in MongoDB. Payments in PostgreSQL.`],
+['m',`When would you use a graph database?`,
+`When relationships are the main data: mutual friends, friends of friends, recommendations. Graph traversal is natural and fast there.`,
+`Neo4j: "people you may know" suggestions.`],
+['h',`Can a single system use more than one database type? How would you justify it?`,
+`Yes, this is called polyglot persistence. Each data type goes to the store that suits its access pattern, at the cost of operating several systems.`,
+`E-commerce: PostgreSQL (orders), MongoDB (catalogue and reviews), Redis (cache and sessions), S3 (images).`],
+['h',`Does NoSQL mean no consistency?`,
+`No. NoSQL usually relaxes strict ACID for scalability and performance, and many offer tunable consistency. You must check what your chosen database guarantees.`,
+`DynamoDB offers strongly consistent reads as an option.`]
+]});
+
+T.push({t:`Microservices`,q:[
+['e',`What is a monolith?`,
+`An application built as a single deployable unit: user management, products, orders and payments all live in one backend.`,
+`One Express app handles <code>/users</code>, <code>/products</code>, <code>/orders</code> and <code>/payments</code>.`],
+['e',`What are microservices?`,
+`Breaking a large application into smaller, independently deployable services, each owning one business capability.`,
+`User Service, Product Service, Order Service and Payment Service, each with its own backend.`],
+['m',`Why break an app into microservices?`,
+`Scale only the busy service, choose a different tech stack per service, and isolate failures so one crash does not take down everything.`,
+`Product Service gets 3 machines, User Service 2, Payment Service 1. Order Service in Golang while User Service is NodeJS.`],
+['m',`How does a failure behave differently in a monolith and in microservices?`,
+`In a monolith, a crash in one part can bring the whole app down. In microservices, if the Order Service crashes, User and Product services keep working.`,
+`The site can still show products even though checkout is down.`],
+['m',`When should you use microservices?`,
+`When team size and structure justify it: a startup's microservices usually mirror its teams. They are also chosen when you want to avoid a single point of failure. Most startups begin with a monolith and split later.`,
+`Three teams, three business areas → three services. A 3-person startup → one monolith.`],
+['m',`Why do most startups start with a monolith?`,
+`Only two or three engineers work on the tech, so the coordination overhead of many services is not worth it. A monolith is simpler to build, test and deploy.`,
+`Move to microservices when many teams step on each other's code.`],
+['m',`How do clients call services in a microservice architecture?`,
+`Through an API gateway: a single endpoint that maps each incoming request to the correct service. Clients do not need each service's address.`,
+`<code>/product</code> → Product Service at 192.168.24.38. <code>/order</code> → Order Service.`],
+['m',`What extra features does an API gateway provide?`,
+`Rate limiting, caching, authentication and authorization, plus routing.`,
+`The gateway rejects tokens that are invalid before they reach any service.`],
+['m',`Can each microservice be scaled independently? How does that look?`,
+`Yes. Each service has its own machines, so you allocate capacity by traffic, and the API gateway routes to whichever instances exist.`,
+`Product 3 instances, User 2, Payment 1.`],
+['h',`What are the drawbacks of microservices?`,
+`More moving parts: network calls between services, harder debugging and monitoring, distributed data consistency, and deployment complexity. They only pay off when scale and teams demand it.`,
+`A single page load might fan out to 6 service calls. Any one of them can be slow or fail.`],
+['h',`How should microservices communicate: REST or message broker?`,
+`Use synchronous REST when the caller needs the answer immediately (for example, payment result). Use a message broker for non-critical, slow or fan-out work such as emails or inventory updates.`,
+`Order → Payment: REST. Order → Notification: Kafka or RabbitMQ.`],
+['h',`Should microservices share one database?`,
+`Generally each service should own its data so it can evolve and scale independently. Sharing a database couples services together and recreates the monolith's problems. Other services get data via APIs or events.`,
+`Order Service stores orders. Inventory Service learns about new orders from an event, not by querying the orders table.`]
+]});
+
+T.push({t:`Load balancer`,q:[
+['e',`What is a load balancer and why do we need it?`,
+`It is the single point of contact for clients. Clients call its domain name and it redirects each request to one of several servers, usually the least busy, so horizontal scaling works without clients knowing about individual servers.`,
+`Users hit <code>api.shop.com</code>; behind it, five servers share the work.`],
+['e',`How does the Round Robin algorithm work?`,
+`Requests go to servers sequentially in a circle. Request 1 → server 1, 2 → server 2, 3 → server 3, 4 → server 1 again.`,
+`7th request with 3 servers goes to server 1.`],
+['m',`What are the pros and cons of Round Robin?`,
+`Pros: simple, works well if servers have similar capacity. Cons: ignores server health and current load.`,
+`If server 2 is slow, it still receives every third request.`],
+['m',`How does Weighted Round Robin improve on Round Robin?`,
+`Servers get weights based on capacity and higher-weight servers receive proportionally more requests. The weights are static, so they may not reflect real-time performance.`,
+`Server 3 has twice the RAM and CPU, so it gets twice as many requests as servers 1 and 2.`],
+['m',`How does the Least Connections algorithm work?`,
+`It sends traffic to the server with the fewest active connections (HTTP, TCP, WebSocket), balancing dynamically on real-time activity. It may not work well when connections vary a lot in duration.`,
+`Server A has 5 active connections, B has 20: the next request goes to A.`],
+['m',`How does Hash-Based load balancing work, and what is it good for?`,
+`The balancer hashes something like client IP or user ID to pick a server, so the same client always lands on the same server. It is useful for session persistence.`,
+`<code>hash(user_id) % 4</code> always sends user 42 to the same server and its in-memory session.`],
+['m',`What is the weakness of simple hash-based balancing?`,
+`When servers are added or removed, the modulus changes and many clients get remapped, breaking session consistency. Consistent hashing reduces this problem.`,
+`Going from 4 to 5 servers remaps most users to a different server.`],
+['m',`How would you choose between the algorithms?`,
+`Similar servers and short requests: Round Robin. Unequal servers: Weighted Round Robin. Long-lived or uneven connections: Least Connections. Need stickiness: Hash-based.`,
+`Chat servers with long WebSocket connections: Least Connections.`],
+['m',`What is session persistence (sticky sessions) and why might it be needed?`,
+`Routing a given user to the same server each time, because that server keeps the user's state in memory. Better design is stateless servers with shared state in Redis, but sticky routing is sometimes used.`,
+`Shopping cart stored in one server's RAM requires hash-based routing, or move the cart to Redis.`],
+['h',`Is the load balancer itself a single point of failure? How do you handle it?`,
+`It can be. Run multiple load balancers (active-passive or active-active), typically a managed service across availability zones, and use health checks to detect failures.`,
+`AWS Application Load Balancer is already redundant across zones.`],
+['h',`What is a health check in a load balancer?`,
+`The balancer periodically probes servers (for example an HTTP <code>/health</code> endpoint) and stops sending traffic to those that fail, restoring them when they recover.`,
+`A server returns 500 on <code>/health</code>, so the balancer removes it from rotation within seconds.`],
+['h',`How is a load balancer related to a reverse proxy?`,
+`A load balancer is a kind of reverse proxy: clients talk to it and never see the actual servers. Reverse proxies like Nginx and HAProxy can do load balancing too.`,
+`Nginx configured with an <code>upstream</code> group of three servers.`]
+]});
+
+T.push({t:`Caching and Redis`,q:[
+['e',`What is caching?`,
+`Storing frequently accessed or pre-computed data in a fast storage layer so future requests are served faster, instead of recomputing or re-reading from a slow source.`,
+`Cache the result of an expensive query in Redis and return it directly next time.`],
+['e',`Walk through the caching example: 600 ms down to 60 ms.`,
+`Fetching from MongoDB takes 500 ms and processing takes 100 ms, so 600 ms in total. If the calculated result is cached in Redis, later requests skip both and return in about 60 ms (hypothetical numbers).`,
+`First call 600 ms, every following call about 60 ms until the cache expires.`],
+['e',`What are the benefits of caching?`,
+`Better performance (lower latency), reduced load on databases and services, lower cost, and better scalability under heavy traffic.`,
+`A cache absorbing 90% of reads means the database only sees 10% of the traffic.`],
+['e',`What are cache hit and cache miss?`,
+`A hit means the data is present in the cache and returned from it. A miss means it is not, so you fetch from the database, usually store it in the cache, and return it.`,
+`First visit to <code>/blogs</code>: miss, 800 ms. Next visit: hit, 20 ms.`],
+['m',`Describe the cache-aside flow for a <code>/blogs</code> route.`,
+`1) Check Redis for the key. 2) If hit, return it. 3) If miss, query the database, store the result in Redis with a TTL, return it. This is often implemented as middleware in the backend.`,
+`Cached for 24 hours; after that Redis deletes it and the next request refills it.`],
+['m',`What is cache invalidation and what are common approaches?`,
+`Removing or updating stale cache entries when the underlying data changes. Approaches: set an expiry (TTL), delete the key when data is written, or write to the database and the cache together.`,
+`When a new blog is published, delete the <code>blogs</code> key so the next read refreshes it.`],
+['m',`What is TTL in caching?`,
+`Time To Live: how long an entry stays in the cache before it automatically expires.`,
+`<code>SET blogs data EX 86400</code> keeps it for 24 hours.`],
+['e',`What are the four types of caches?`,
+`Client-side (browser cache), server-side (Redis, Memcached), CDN cache (static files at edge servers), and application-level cache (inside application code for intermediate or query results).`,
+`CSS and JS cached in the browser, images in CloudFront, user profiles in Redis.`],
+['m',`What is the second caching approach mentioned: writing to the cache on write?`,
+`When the server writes to the database it also writes to the cache, so the cache stays current without waiting for expiry.`,
+`Codeforces contest: each submission updates the ranking in the database and Redis at the same time, so the leaderboard is fresh.`],
+['e',`What is Redis?`,
+`An in-memory data structure store. Data lives in RAM, so reads and writes are extremely fast compared with disk-based databases. Redis stores data as key-value pairs.`,
+`<code>GET user:1</code> returns in well under a millisecond.`],
+['m',`If Redis is so fast, why not use it as the only database?`,
+`RAM is much smaller and more expensive than disk, so you cannot store all data there. It is best for hot, frequently accessed data, with a durable database as the source of truth.`,
+`Keep 10 GB of hot product data in Redis, 10 TB of everything in the database.`],
+['e',`What is the key naming convention in Redis?`,
+`Use colons to separate parts: <code>user:1</code> for user 1, <code>user:2:email</code> for user 2's email.`,
+`<code>SET user:1 Shivam</code>, <code>GET user:1</code>.`],
+['m',`Name the common Redis data types and commands.`,
+`Strings (<code>SET</code>, <code>GET</code>, <code>MGET</code>, <code>SET key value NX</code> only if key is absent), lists (<code>LPUSH</code>, <code>RPUSH</code>, <code>LPOP</code>, <code>RPOP</code>, <code>LLEN</code>), and more such as sets, hashes and sorted sets.`,
+`<code>MGET user:1 user:2</code> fetches two values in one call.`],
+['m',`How do you implement a queue and a stack with Redis lists?`,
+`Queue (FIFO): <code>LPUSH</code> to add on the left and <code>RPOP</code> to remove from the right. Stack (LIFO): <code>LPUSH</code> and <code>LPOP</code> on the same side.`,
+`LPUSH job1, LPUSH job2, RPOP returns job1.`],
+['h',`What are the risks of caching and how do you handle them?`,
+`Stale data (use TTL or invalidate on write), memory limits (use eviction policies such as LRU), and a cold cache or a hot key expiring while many requests hit the database at once (stagger TTLs, pre-warm, or allow only one request to rebuild).`,
+`If a popular key expires, 10,000 concurrent requests may all query the database. Use a lock so only one refills it.`]
+]});
+
+T.push({t:`Blob storage`,q:[
+['e',`What is a blob?`,
+`A Binary Large Object: the binary (0s and 1s) representation of files such as mp4, png, jpeg and pdf.`,
+`A 1 GB video is a single blob.`],
+['e',`Why don't we store blobs in a regular database?`,
+`Large binary data makes queries slow, and you would have to handle scaling, backups and availability for huge volumes yourself. It is also expensive compared with blob storage.`,
+`Storing videos inside MySQL rows bloats the database and slows every query on that table.`],
+['e',`What is blob storage?`,
+`A managed service designed for storing large files. The provider handles scaling, durability and security, so you treat it as a black box.`,
+`AWS S3 and Cloudflare R2.`],
+['e',`What is AWS S3?`,
+`Amazon's blob storage service for any kind of file (mp4, png, jpeg, pdf, html). Think of it like Google Drive for your application.`,
+`Store user profile pictures in an S3 bucket.`],
+['m',`What are the key features of S3?`,
+`Scalability, 99.999999999% (11 nines) durability, high availability, pay-as-you-go cost efficiency, encryption at rest and in transit, and fine-grained access control via policies, ACLs and pre-signed URLs.`,
+`Bucket policy: only the backend role may write; the public can read with a pre-signed link.`],
+['m',`Why is S3 cheaper than a database for files?`,
+`It is optimised for bulk object storage, not for queries, so storing 1 GB in S3 costs far less than in a managed database such as RDS.`,
+`Keep 5 TB of images in S3 rather than in PostgreSQL.`],
+['m',`Describe an image upload feature design using a database and S3.`,
+`The client sends the file, the backend stores it in S3, and the database stores only metadata (user id, S3 key or URL). When displaying, the client loads the image from S3 or a CDN URL.`,
+`<code>users.avatar_url = "https://cdn.app.com/avatars/42.png"</code>.`],
+['h',`What are pre-signed URLs and why use them?`,
+`Temporary URLs that grant time-limited access to a private object. They let a client upload or download directly from S3 without routing large files through your servers or making the bucket public.`,
+`Backend returns a pre-signed PUT URL valid for 5 minutes. The browser uploads straight to S3.`],
+['m',`How do blob storage and a CDN work together?`,
+`S3 is the origin that holds the files. A CDN such as CloudFront caches them at edge servers close to users, so media loads quickly worldwide.`,
+`Videos in an India S3 bucket are cached in US edge locations for American users.`],
+['h',`What does "11 nines of durability" mean in practice?`,
+`It means the chance of losing an object is extremely small, because data is stored redundantly. Durability (not losing data) is different from availability (being reachable right now).`,
+`With 10 million objects you would statistically expect to lose one about every 10,000 years.`]
+]});
+
+T.push({t:`Content delivery network (CDN)`,q:[
+['e',`What is a CDN?`,
+`A set of geographically distributed servers that cache and deliver static content (images, videos, CSS, JS, PDFs) from the location closest to the user, reducing latency, load times and bandwidth costs.`,
+`CloudFront and Cloudflare.`],
+['e',`Why do we need a CDN?`,
+`Serving files from one distant origin is slow. If your S3 bucket is in India, users in the USA or Australia wait much longer than users nearby. A CDN stores copies near them.`,
+`A 5 MB image served from Mumbai to Sydney is slow; from a Sydney edge it is fast.`],
+['m',`How does a CDN work step by step?`,
+`The user's request goes to the nearest edge server. If the content is cached there, it is returned. If not, the edge fetches it from the origin server, caches it, and returns it. Later requests are served from the edge.`,
+`First user in Sydney causes a miss; the next thousand are hits.`],
+['e',`What is an edge server?`,
+`A geographically distributed CDN server where content is cached and from which users are served.`,
+`An edge location in Frankfurt serves European users.`],
+['e',`What is an origin server?`,
+`Your main source of truth (for example S3 or your web server) from which the CDN pulls content when it is not cached.`,
+`<code>my-bucket.s3.ap-south-1.amazonaws.com</code>.`],
+['m',`What is TTL in a CDN?`,
+`How long a file stays cached at an edge before it must be refreshed from the origin.`,
+`TTL of 24 hours: updated image appears at the edge within a day unless you invalidate it.`],
+['m',`What is GeoDNS?`,
+`DNS that returns different answers depending on the user's location, so users are routed to the nearest edge server.`,
+`A user in Brazil resolves the CDN domain to a São Paulo edge.`],
+['m',`How do you update a file that is already cached on the CDN?`,
+`Wait for the TTL to expire, explicitly invalidate the path, or use versioned file names so a new name forces a fresh fetch.`,
+`Deploy <code>app.v2.js</code> instead of overwriting <code>app.js</code>.`],
+['m',`What is the difference between a CDN and a Redis cache?`,
+`A CDN caches static files at the network edge close to users. Redis caches data and computed results next to your backend, typically in memory. They solve different layers of latency.`,
+`CDN: product images. Redis: the product list JSON.`],
+['h',`Can a CDN help with dynamic content?`,
+`The article focuses on static content. Some CDNs can also accelerate dynamic requests and cache short-lived responses, but the clearest wins are static files.`,
+`Cache a public API response for 30 seconds at the edge.`]
+]});
+
+T.push({t:`Message brokers`,q:[
+['e',`What is the difference between synchronous and asynchronous programming in a system?`,
+`Synchronous: the server processes the request and responds immediately, so the client waits. Asynchronous: the server accepts the task, replies "processing", and a background worker finishes it later.`,
+`Video upload returns instantly; transcoding happens in the background.`],
+['e',`Why can't a 10-minute task be done synchronously?`,
+`The client would wait too long and the HTTP request would time out. Instead, acknowledge the request and process it in the background, then notify the user.`,
+`"Your PDF is being generated. We will email you when ready."`],
+['e',`What is a message broker?`,
+`A middle layer, often a queue, between producers and consumers. The producer puts a message in and the consumer pulls it out when ready.`,
+`RabbitMQ, AWS SQS, Apache Kafka, AWS Kinesis.`],
+['e',`What are producers and consumers?`,
+`The producer puts messages (tasks) into the broker. The consumer (worker) pulls and processes them, typically deleting them after success in a queue.`,
+`Upload Service (producer) → queue → Transcoder (consumer).`],
+['m',`Why put a message broker between services?`,
+`Reliability (workers continue even if the producer is down), retries (an unprocessed message stays in the broker), and decoupling (each side works at its own pace).`,
+`If a worker crashes mid-task, the message is still there to retry.`],
+['e',`What are the two types of message brokers?`,
+`Message queues (RabbitMQ, AWS SQS) and message streams (Apache Kafka, AWS Kinesis).`,
+`Queue: one consumer type per message. Stream: many consumer types per message.`],
+['m',`How does a message queue work and how do you scale consumers?`,
+`The producer adds messages at one end and a consumer takes them from the other, then deletes the message when done. To scale, add more consumers. Any free one can pick the next message, enabling parallel processing.`,
+`3 transcoder workers process 3 videos simultaneously.`],
+['m',`Why is a message queue not enough when you also need captions generated?`,
+`The transcoder deletes the message after processing, so the caption service cannot see it. Using two queues forces the producer to write twice, and if it fails between writes you get inconsistency (video transcoded but no captions).`,
+`Write to queue 1 succeeds, then the producer crashes before writing to queue 2.`],
+['m',`How does a message stream differ from a queue?`,
+`In a stream, one message can be read by many types of consumers ("write to one, read by many"). Consumers iterate over messages and do not delete them. Messages stay until they expire or are removed manually.`,
+`Transcoder and Caption Generator both read video-1, then video-2, and so on.`],
+['m',`When should you use a message broker instead of REST between microservices?`,
+`When the task is non-critical (can tolerate delay) or long-running. Use REST when the caller needs the result right now.`,
+`Sending emails and generating PDFs: broker. Charging a card: REST.`],
+['h',`Compare queue and stream on message retention and consumer groups.`,
+`Queue: message removed after processing, one logical consumer set. Stream: messages retained, any number of independent consumer groups each track their own position (offset) and can replay.`,
+`A new analytics consumer can start reading yesterday's events from a stream.`],
+['h',`What can go wrong with message brokers and how do you handle it?`,
+`Duplicate processing, poison messages that keep failing, and consumers falling behind. Handle with idempotent consumers, retry limits with dead-letter queues and monitoring of queue lag with scaling of consumers.`,
+`A bad message fails 5 times and is moved to a dead-letter queue for inspection.`]
+]});
+
+T.push({t:`Apache Kafka`,q:[
+['e',`What is Kafka and what is it used as?`,
+`Kafka is used as a message stream with very high throughput. It lets many producers write huge volumes of data and many consumer groups read it independently.`,
+`Uber-style driver location updates every 2 seconds.`],
+['m',`Explain the Uber driver-location example for Kafka.`,
+`Thousands of drivers report location every 2 seconds. Writing each directly to the database would overwhelm it because DB throughput is low. Write to Kafka, which handles very high throughput, and let a consumer bulk-write to the DB every 10 minutes.`,
+`The database sees one bulk write every 10 minutes instead of thousands per second.`],
+['e',`What are producer, consumer and broker in Kafka?`,
+`Producer publishes messages. Consumer subscribes to topics and processes messages. Broker is a Kafka server that stores and manages topics.`,
+`Producer sends <code>{email, message}</code> to topic <code>sendEmail</code>.`],
+['e',`What is a topic?`,
+`A named category or feed to which records are published. By analogy: broker = database server, topic = table.`,
+`<code>sendEmail</code> and <code>writeLocationToDB</code> are topics.`],
+['m',`What is a partition and why do we have it?`,
+`Each topic is split into partitions for parallelism, similar to sharding a DB table. You decide the basis of partitioning, such as location or user ID.`,
+`<code>sendNotification</code>: North India → partition 1, South India → partition 2.`],
+['m',`What is a consumer group?`,
+`When a consumer subscribes to a topic it joins a group. Each consumer in a group processes a subset of partitions, and different groups each get all messages of the topic.`,
+`Group "transcoder" and group "captions" both read every video event.`],
+['m',`How does Kafka assign 4 partitions to 3 consumers in one group?`,
+`Kafka rebalances automatically. For example Consumer-1 gets Partition-0, Consumer-2 gets Partitions 1 and 2, Consumer-3 gets Partition-3.`,
+`If Consumer-3 dies, Kafka rebalances its partition to the others.`],
+['m',`What happens if there are more consumers than partitions in a group?`,
+`Each consumer handles one partition and the extra consumers stay idle. One partition can be processed by only one consumer in a group.`,
+`4 partitions and 6 consumers: 2 consumers do nothing.`],
+['m',`What decides the maximum parallelism of a consumer group?`,
+`The number of partitions. To scale consumers horizontally you need at least as many partitions as consumers.`,
+`Want 10 parallel workers? Create at least 10 partitions.`],
+['m',`Can different consumer groups process the same topic?`,
+`Yes. A partition is read by only one consumer within a group, but different groups read the same data independently.`,
+`Video topic: a transcoding group and a caption group both consume all messages.`],
+['m',`How is Kafka different from RabbitMQ or SQS?`,
+`Kafka is a message stream: messages are retained, multiple groups read independently and throughput is very high. RabbitMQ and SQS are queues where consumers delete messages after processing.`,
+`Kafka suits event logs and analytics. SQS suits simple background jobs.`],
+['h',`How would you choose a partition key and what pitfalls exist?`,
+`Pick a key that distributes load evenly and keeps related messages together for ordering within a partition. A skewed key creates a hot partition.`,
+`Using <code>driver_id</code> keeps one driver's updates ordered. Using <code>city</code> may overload partitions for large cities.`]
+]});
+
+T.push({t:`Realtime Pub/Sub`,q:[
+['e',`What is Pub/Sub?`,
+`A pattern where publishers send messages to a broker and the broker immediately pushes them to all currently subscribed consumers, with no polling.`,
+`Redis Pub/Sub.`],
+['e',`How does Pub/Sub differ from a message broker (queue or stream)?`,
+`In a message broker consumers pull messages using an API or SDK and messages wait until pulled. In Pub/Sub the broker pushes messages instantly to subscribers.`,
+`SQS: worker polls. Redis Pub/Sub: message arrives on its own.`],
+['m',`Does a Pub/Sub broker store messages?`,
+`No. It forwards the message to current subscribers and discards it. No retention.`,
+`A subscriber that is offline when the message is published never receives it.`],
+['m',`What are the consequences of no retention?`,
+`No replay and no guaranteed delivery to offline consumers. Use it for ephemeral, low-latency events, not for critical data.`,
+`Do not use plain Pub/Sub to deliver payment confirmations.`],
+['e',`Which tool is an example of a realtime Pub/Sub broker?`,
+`Redis, which is used not only for caching but also for Pub/Sub.`,
+`<code>SUBSCRIBE chat:room1</code> and <code>PUBLISH chat:room1 "hello"</code>.`],
+['m',`When do we use realtime Pub/Sub?`,
+`For very low-latency applications such as live chat, notifications and live dashboards.`,
+`Real-time chat between users connected to different servers.`],
+['m',`Explain the chat app problem in a horizontally scaled WebSocket setup.`,
+`Client-1 is connected to Server-1 and Client-3 to Server-2. Server-1 cannot deliver directly to Client-3 because it has no connection to it.`,
+`Messages from Client-1 must somehow reach Server-2.`],
+['m',`How does Redis Pub/Sub solve it?`,
+`Every chat server subscribes to a channel. Server-1 publishes the message to Redis, which pushes it to all subscribed servers, and Server-2 forwards it to Client-3 over its WebSocket.`,
+`Client-1 → Server-1 → Redis → Server-2 → Client-3.`],
+['m',`Pub/Sub vs Kafka: when to choose which?`,
+`Pub/Sub for instant, ephemeral fan-out where loss is acceptable. Kafka when messages must be stored, replayed and processed reliably at high throughput.`,
+`Typing indicator: Pub/Sub. Order events: Kafka.`],
+['h',`How would you build a reliable chat system on top of Pub/Sub's limitations?`,
+`Persist messages in a database or stream first, then use Pub/Sub only for real-time delivery to connected clients. Offline users fetch missed messages from storage when they reconnect.`,
+`Save to DB → publish to channel → on reconnect, load unread messages from DB.`]
+]});
+
+T.push({t:`Event-driven architecture`,q:[
+['e',`What is event-driven architecture (EDA)?`,
+`A design where a producer puts an event into a message broker and moves on, and consumers react to it on their own, instead of the producer calling services directly.`,
+`"OrderPlaced" event consumed by Inventory and Notification services.`],
+['m',`Describe the problem EDA solves in an e-commerce purchase.`,
+`Order Service calls Payment, then Inventory and Notification before returning the success page. Inventory and Notification do not affect the response, so the user should not wait for them, and their failure should not break checkout.`,
+`If Inventory is down, a purchase should still succeed and the update happens later.`],
+['e',`What are the advantages of EDA?`,
+`Decoupling (producers do not know consumers), resilience (one component's failure does not block others) and scalability (each service scales on its own).`,
+`Add a new Analytics consumer without changing the Order Service.`],
+['e',`What is an event?`,
+`A message describing that something happened, placed in the broker by a producer.`,
+`<code>{type: "OrderPlaced", orderId: 981}</code>`],
+['m',`What are the four EDA patterns, and which two does the article cover?`,
+`Simple Event Notification, Event-Carried State Transfer, Event Sourcing, and Event Sourcing with CQRS. The first two are used most often and are covered in the article.`,
+`Event sourcing stores every change as an event instead of current state.`],
+['m',`What is Simple Event Notification?`,
+`The producer sends only lightweight information that something happened. Consumers fetch additional details from the database if they need them.`,
+`Event contains <code>order_id</code> only. Notification service queries the order to build the email.`],
+['m',`What is Event-Carried State Transfer?`,
+`The event includes all necessary details, so consumers need no extra calls.`,
+`Event holds order id, items, address and email, so the notification service can send mail without calling anything.`],
+['m',`Compare the two patterns' pros and cons.`,
+`Simple notification: small events but consumers make extra calls (more latency, coupling to the source). Event-carried state: lower latency, no extra calls, but bigger events increase broker storage and bandwidth cost.`,
+`A 200-byte event vs a 20 KB event across millions of orders.`],
+['m',`How is EDA different from calling services directly with REST?`,
+`REST is synchronous and tightly coupled: the caller waits and is affected by the callee's failures. EDA is asynchronous: the producer publishes and forgets, and the consumer is responsible for processing.`,
+`Inventory outage breaks REST checkout but not event-driven checkout.`],
+['h',`When should you NOT use EDA?`,
+`When the caller needs an immediate answer or strict, in-order confirmation, such as payment authorisation. Also avoid it where added complexity (eventual consistency, debugging async flows) is not worth it.`,
+`Order must wait for payment result: use a synchronous call, then publish events for the rest.`]
+]});
+
+T.push({t:`Distributed systems`,q:[
+['e',`What is a distributed system?`,
+`A system in which work is done by a set of multiple machines instead of one.`,
+`Counting primes in 0–10¹⁰⁰ split across 10 computers.`],
+['e',`Why do we need distributed systems?`,
+`Some tasks or data volumes exceed what a single machine can handle. Splitting them across machines gives more capacity and parallelism.`,
+`Run the prime counting for loop on one laptop and it will never finish.`],
+['m',`Describe the prime-number example.`,
+`Divide the range among 10 computers (computer 1 does 0 to 10¹⁰, computer 2 does 10¹⁰+1 to 10²⁰ and so on), compute in parallel, and combine the partial results.`,
+`Each worker returns a count, and the coordinator adds them.`],
+['m',`Give examples of distributed systems from earlier topics.`,
+`Sharding (a table spread across servers), horizontal scaling (many servers handle requests), and distributed databases such as Cassandra, DynamoDB, MongoDB, Google Spanner and Redis.`,
+`Cassandra shards data across many nodes.`],
+['m',`How should a distributed system look to the client?`,
+`Like a single machine. The system accepts requests, performs the work across nodes and returns a result.`,
+`You call one endpoint; behind it, 50 nodes cooperate.`],
+['m',`What is the hardest part of a distributed system?`,
+`Coordination: how machines cooperate, divide work evenly, handle failures and agree on state.`,
+`What if worker 7 crashes halfway through its share?`],
+['m',`What is the leader-follower model?`,
+`One server is the leader. It accepts client requests, assigns work to followers, collects their results, combines them and replies. Followers do the assigned work.`,
+`A leader splits a 1 TB job into 10 shards for 10 followers.`],
+['m',`When does the system need to pick a leader?`,
+`When it first starts, and whenever the current leader goes down. Followers must detect the failure quickly.`,
+`Heartbeats stop arriving from the leader, so followers start an election.`],
+['m',`How does the CAP theorem relate to distributed systems?`,
+`CAP is the fundamental trade-off for any distributed system: during a network partition you must choose between consistency and availability.`,
+`Cassandra leans AP. Systems with strict consensus lean CP.`],
+['h',`What failure modes make distributed systems hard?`,
+`Node crashes, network partitions, slow nodes, message loss or duplication, and clock differences. Designs need replication, timeouts, retries, idempotency and agreed leader or consensus mechanisms.`,
+`A retry after a timeout might run the same payment twice unless the operation is idempotent.`]
+]});
+
+T.push({t:`Leader election and auto-recovery`,q:[
+['e',`What is leader election?`,
+`A mechanism that lets the servers in a distributed system agree on which one is the leader, both initially and after a leader failure.`,
+`Five nodes start; the algorithm picks node 3 as leader.`],
+['m',`Name some leader election algorithms and their complexity.`,
+`LCR: O(N²). HS: O(N log N). Bully: O(N). Gossip protocol: O(log N). For system design it is enough to treat them as a black box.`,
+`Bully: the highest-ID live node becomes leader.`],
+['e',`What problem does an orchestrator solve?`,
+`It monitors servers and automatically restarts any that go down, so you do not have to watch them manually.`,
+`You always want at least 4 servers running; the orchestrator keeps it that way.`],
+['m',`Who monitors the orchestrator?`,
+`You run several orchestrators, elect one as leader-orchestrator, and have it watch the others. If the leader goes down, a worker orchestrator promotes itself using the leader election algorithm.`,
+`Leader → watches worker-orchestrators → watch application servers.`],
+['m',`Describe the full auto-recovery chain.`,
+`A server dies → a worker-orchestrator restarts it. A worker-orchestrator dies → the leader restarts it. The leader dies → a worker orchestrator becomes leader via election. No human intervention is needed.`,
+`Self-healing: the system repairs each layer by itself.`],
+['m',`How do nodes detect that a leader or server is down?`,
+`Heartbeats: periodic signals (HTTP or TCP requests every few seconds). If heartbeats stop, the node is considered failed.`,
+`Followers expect a heartbeat every 3 seconds; none for 10 seconds triggers election.`],
+['m',`Where is this pattern used in practice?`,
+`Container orchestration and cluster managers (for example Kubernetes and Docker Swarm) and distributed databases use leader election and consensus for high availability.`,
+`Docker Swarm uses Raft internally.`],
+['h',`What is split-brain and how do you avoid it?`,
+`Two nodes both believe they are the leader, typically after a network partition, causing conflicting writes. Avoid it with majority quorums so only the partition with more than 50% of nodes can elect a leader.`,
+`In a 5-node cluster, the side with 3 nodes keeps a leader; the side with 2 cannot.`],
+['h',`Why not just keep one very reliable orchestrator?`,
+`Any single instance is a single point of failure, however reliable. Replication plus leader election removes the SPOF.`,
+`Hardware failure takes out one orchestrator; the others carry on.`],
+['h',`What is the role of consensus algorithms like Raft here?`,
+`They let nodes agree on a leader and on the order of changes, usually requiring acknowledgement from more than 50% of nodes. Raft is a relatively easy one to learn.`,
+`A write is committed once 3 of 5 nodes acknowledge it.`]
+]});
+
+T.push({t:`Big data tools`,q:[
+['e',`Why do we need big data tools?`,
+`A single machine cannot process very large datasets; it chokes or is too slow. Big data tools use distributed systems to split the work across many machines.`,
+`Training a model on terabytes of data.`],
+['e',`Name some big data tools.`,
+`Apache Spark and Apache Flink are the examples mentioned.`,
+`Spark jobs written in Python, Java or Scala.`],
+['m',`Describe the coordinator-worker architecture.`,
+`The client sends a request to the coordinator. It divides the large dataset into smaller parts, assigns them to workers, collects results, combines them and returns the final answer.`,
+`Count word frequency across 10 TB of logs: each worker counts its chunk.`],
+['m',`What responsibilities does the coordinator have?`,
+`Move data to another machine if a worker crashes, restart failed workers (recovery), combine individual results, handle scaling and redistribution of data, and logging.`,
+`Worker 4 dies at 80%; the coordinator reassigns its chunk.`],
+['m',`When should you use a distributed big data approach?`,
+`When a single EC2 instance cannot handle the data or computation.`,
+`Training ML models, analysing social networks, recommendations, or ingesting data from many sources into a warehouse.`],
+['m',`Why use Spark instead of building your own coordinator and workers?`,
+`Building this infrastructure is very hard and the problem is common, so open-source tools provide it. You only write business logic and use the tool as a black box.`,
+`You write the transformation in PySpark; Spark runs it distributed.`],
+['m',`What do you focus on when using a tool like Spark?`,
+`The business logic (jobs), not the plumbing of distribution, failure handling and scheduling.`,
+`A job that cleans data and computes daily active users.`],
+['m',`How do big data tools relate to sharding and distributed systems?`,
+`They use the same distributed-system ideas: partition data, process in parallel, and combine results.`,
+`Each worker processes one data partition, like a shard.`],
+['h',`What is the difference between batch and stream processing?`,
+`Batch processes large accumulated datasets at intervals (Spark batch jobs). Stream processes events continuously as they arrive (Flink, Spark Streaming), often reading from Kafka.`,
+`Nightly sales report: batch. Live fraud detection: stream.`],
+['h',`How much of this do you need for a system design interview?`,
+`Understanding the coordinator-worker idea and when it is needed is enough. Deep knowledge of big-data internals is learned on the job in data-heavy companies.`,
+`Say "I would use Spark for this analytics pipeline" and explain why.`]
+]});
+
+T.push({t:`Consistency deep dive`,q:[
+['e',`Stateful vs stateless: why does consistency matter only for stateful systems?`,
+`Stateless servers hold no useful data, so there is nothing to keep in sync. Consistency concerns data copies across nodes, so it arises with distributed, stateful systems like databases.`,
+`Application servers: stateless. Databases: stateful.`],
+['e',`What is strong consistency?`,
+`Any read after a write returns the most recent write. Once a write is acknowledged, all later reads reflect it, as if only one copy of the data existed.`,
+`You transfer money, and your balance immediately shows the new value from any node.`],
+['e',`What is eventual consistency?`,
+`After a write, replicas may briefly differ, but given time they all converge to the same value. It favours availability and speed over immediate agreement.`,
+`A like count shows 100 on one node and 102 on another for a few seconds.`],
+['m',`When do you choose strong consistency?`,
+`When incorrect or stale data is unacceptable: banking transfers, trading apps showing correct share prices.`,
+`Never show two different balances for one account.`],
+['m',`When do you choose eventual consistency?`,
+`When temporary staleness is acceptable: social media like counts, e-commerce product catalogues.`,
+`A catalogue price update propagating over a few seconds is fine.`],
+['m',`How does consistency relate to CAP?`,
+`Giving up some consistency buys high availability. Eventual consistency is an AP choice, strong consistency is a CP choice.`,
+`During a partition, the AP system serves stale data, the CP system refuses writes.`],
+['m',`What is synchronous replication?`,
+`The write is applied to all replicas before acknowledging the client. It gives strong consistency but slower writes and reduced availability if a replica is down.`,
+`Google Spanner uses synchronous replication.`],
+['h',`Explain quorum-based consistency. What is the W + R > N rule?`,
+`With N replicas, a write must be acknowledged by W nodes and a read must consult R nodes. If W + R > N, the read and write sets overlap so a read sees the latest write (strong consistency). If W + R ≤ N, they may not overlap (eventual consistency).`,
+`N = 5, W = 3, R = 3: 6 > 5, strongly consistent. N = 5, W = 1, R = 1: eventual.`],
+['m',`Which databases are mentioned as using quorum approaches?`,
+`AWS DynamoDB and Cassandra. DynamoDB in eventual-consistency mode uses relaxed quorums.`,
+`Check each database's consistency options before choosing it.`],
+['m',`What are consensus algorithms and an example?`,
+`Algorithms where nodes agree on a value using a leader, and an operation succeeds when more than 50% of nodes acknowledge it. Raft is an easy example.`,
+`Docker Swarm uses Raft internally.`],
+['m',`What is asynchronous replication?`,
+`The write is acknowledged immediately and propagated to replicas in the background. It is fast and highly available but replicas can be stale.`,
+`Cassandra, MongoDB and DynamoDB (default mode).`],
+['h',`What are vector clocks, at a high level?`,
+`A mechanism to track the causal order of updates across replicas so the system can detect concurrent conflicting writes. It is a niche topic; know it exists, as DynamoDB-style systems use the idea.`,
+`Two replicas update the same key independently. Vector clocks reveal the updates are concurrent and need resolution.`],
+['m',`How does the gossip protocol help achieve eventual consistency?`,
+`Nodes exchange heartbeats and updates with a subset of other nodes periodically, spreading information through the cluster and detecting failed nodes.`,
+`Cassandra and DynamoDB use gossip.`],
+['h',`How are conflicts resolved under eventual consistency?`,
+`With a conflict resolution mechanism chosen for the use case: last-write-wins, merge functions, version vectors, or application-level resolution.`,
+`Shopping cart: merge both versions rather than dropping an item.`]
+]});
+
+T.push({t:`Consistent hashing`,q:[
+['e',`What is consistent hashing?`,
+`An algorithm that tells which data belongs to which node, designed to minimise data movement when nodes are added or removed. It only decides placement; moving the data is your job.`,
+`Used internally by DynamoDB, Cassandra and Riak.`],
+['e',`Where is consistent hashing used?`,
+`Mostly with stateful, distributed systems such as databases. Application servers are stateless, so they rarely need it unless you are building a database yourself.`,
+`A key-value store deciding which server holds <code>user:42</code>.`],
+['m',`What is the simple hashing approach and what is its drawback?`,
+`Hash the key and take modulo the number of servers: <code>hash(key) % N</code>. It works for a fixed number of servers, but when N changes, most keys map to a different server, causing massive data movement.`,
+`<code>hash(key1) % 3</code> becomes <code>hash(key1) % 2</code> and key1 may move.`],
+['m',`How does consistent hashing work?`,
+`Hash server IDs onto a ring covering the hash range. Hash each key onto the same ring. A key belongs to the first server clockwise from its position.`,
+`Key-1 and key-4 → Node-1, key-3 → Node-2, key-2 and key-5 → Node-3.`],
+['m',`What happens when a node is removed from the ring?`,
+`Only the keys that belonged to that node move to the next clockwise node. All other keys stay where they are.`,
+`Remove Node-2: key-3 moves to Node-1, nothing else changes.`],
+['m',`What happens when a node is added?`,
+`The new node takes over only the keys between its predecessor and itself, from the next node clockwise. Everything else is unaffected.`,
+`A new node lands between Node-1 and Node-2 and takes a slice of Node-2's keys.`],
+['m',`Does consistent hashing move the data for you?`,
+`No. It only tells you which node owns which key. You must copy or snapshot data between servers yourself or through the database.`,
+`After removing a node, run a job to copy its keys to the next node.`],
+['h',`What problems can arise with a basic ring and how are they fixed?`,
+`Uneven distribution if servers land close together on the ring, and overload of the next node on failure. Virtual nodes (each server placed at many ring positions) spread load more evenly.`,
+`Give each server 100 virtual positions.`],
+['m',`Which hash functions can be used?`,
+`Any good hash function such as SHA, MD5 and so on, mapping to a large range (for example 0 to 2¹²⁸).`,
+`Ring range is the output range of the hash function.`],
+['h',`How would you explain consistent hashing vs hash-based sharding?`,
+`Hash-based sharding with modulo reshuffles most data when shard count changes. Consistent hashing reshuffles only a small fraction, which is why dynamic clusters prefer it.`,
+`Adding a 4th shard remaps about 75% of keys with modulo but only about 25% with consistent hashing.`]
+]});
+
+T.push({t:`Data redundancy and recovery`,q:[
+['e',`What is data redundancy?`,
+`Keeping multiple copies of the same data on different database servers.`,
+`The same orders table lives on two servers in different locations.`],
+['e',`Why make databases redundant?`,
+`To survive disasters (a data centre destroyed by flood) and technical failures (disk crash or corruption) without losing data.`,
+`Primary disk fails; the replica still holds everything.`],
+['m',`What are traditional backup strategies?`,
+`Daily or weekly backups where a snapshot is taken and stored on a different server. You can recover only up to the last backup.`,
+`Nightly snapshot at 2 AM means up to a day of data can be lost.`],
+['m',`What is the drawback of daily or weekly backups?`,
+`Data written after the last backup is lost on failure, and restoring can take time. That is why most companies now use continuous redundancy.`,
+`A crash at 11 PM loses 21 hours of orders if the last backup was at 2 AM.`],
+['m',`What is continuous redundancy?`,
+`A main database and a replica are always kept in sync. Reads and writes happen on the main and replicate synchronously or asynchronously to the replica.`,
+`MySQL primary replicating to a standby.`],
+['m',`What does the replica do in this setup?`,
+`It does not serve client reads or writes; it only stays in sync. If the main fails, the replica is promoted and starts serving.`,
+`Failover from primary to replica within seconds.`],
+['m',`Synchronous vs asynchronous replication for the replica: which to choose?`,
+`Synchronous: no data loss but slower writes. Asynchronous: faster writes, but a small window of potential data loss at failure. Choose by business criticality.`,
+`Payments: synchronous. Analytics events: asynchronous.`],
+['h',`What are RPO and RTO?`,
+`Recovery Point Objective: how much data loss is acceptable (time). Recovery Time Objective: how long recovery may take. They drive your backup and failover design.`,
+`RPO 0 and RTO 30 seconds → synchronous replica with automatic failover.`],
+['h',`Is a replica a replacement for backups?`,
+`Not entirely. A replica copies mistakes too: if someone drops a table, the replica drops it as well. Point-in-time backups protect from logical errors, replicas protect from hardware failure.`,
+`Keep snapshots in addition to replication.`],
+['m',`How would you practise setting this up?`,
+`Use a cloud service such as AWS RDS to create a replica, and also set up two MySQL servers locally, write to the main, and verify the data appears in the replica.`,
+`Insert a row on the main and select it on the replica.`]
+]});
+
+T.push({t:`Proxy: forward and reverse`,q:[
+['e',`What is a proxy?`,
+`An intermediary server that sits between a client and another server.`,
+`A VPN or Nginx in front of your app.`],
+['e',`What is a forward proxy?`,
+`A proxy that acts on behalf of the client. The server sees only the proxy's IP, so the client's identity is hidden.`,
+`A VPN requests websites for you.`],
+['e',`What is a reverse proxy?`,
+`A proxy that acts on behalf of servers. Clients talk to it and never see the real backend servers.`,
+`Nginx or HAProxy routing to backend servers.`],
+['m',`What is the key difference between forward and reverse proxies?`,
+`Forward proxy hides the client from servers. Reverse proxy hides the servers from clients.`,
+`VPN user vs website visitor hitting a load balancer.`],
+['m',`What are the use cases of a forward proxy?`,
+`Access geo-blocked content, cache frequently accessed content for clients, and let organisations filter employees' internet usage.`,
+`A college blocks social media through its proxy.`],
+['m',`What are the use cases of a reverse proxy?`,
+`Load balancing, SSL termination (encryption and decryption off the servers), caching static content, and security by not exposing backend servers directly.`,
+`HTTPS ends at Nginx; backends speak plain HTTP internally.`],
+['m',`Is a load balancer a reverse proxy?`,
+`Yes. Clients know only the load balancer's address, not the actual servers behind it.`,
+`Requests to <code>abc.com</code> are forwarded to one of many backends.`],
+['m',`Describe the request flow through a reverse proxy.`,
+`Client requests <code>www.abc.com</code> → the reverse proxy receives it → forwards to one of the backend servers → the server responds to the proxy → the proxy responds to the client.`,
+`The client never learns the backend IPs.`],
+['m',`How would you build a simple reverse proxy for Product and Order services?`,
+`Run a proxy server (for example NodeJS with <code>http-proxy</code>) on port 8080. If the URL starts with <code>/product</code>, forward to the Product service on port 5001. If it starts with <code>/order</code>, forward to port 5002. Otherwise return 404.`,
+`<code>localhost:8080/product</code> reaches the Product service.`],
+['m',`What does a 502 Bad Gateway mean in the proxy code?`,
+`The proxy could not get a valid response from the upstream service (down or unreachable), so it returns 502 to the client.`,
+`Product service crashed → client sees 502.`],
+['m',`Why use Nginx instead of your own reverse proxy in production?`,
+`Specialised proxies are highly optimised and provide features like caching and SSL termination. Do not reinvent the wheel.`,
+`Learn Nginx and use it in your side projects.`],
+['h',`How does an API gateway relate to a reverse proxy?`,
+`An API gateway is a reverse proxy specialised for APIs. It adds routing plus rate limiting, authentication, caching and request transformation in front of microservices.`,
+`The gateway validates a JWT, applies a rate limit, then routes to a service.`]
+]});
+
+T.push({t:`How to solve any system design problem`,q:[
+['e',`What approach does the article suggest for solving a system design problem?`,
+`Understand the problem, break it into small solvable sub-problems, then solve each sub-problem by deciding database, caching, scaling and fault tolerance, and communication style.`,
+`E-commerce: listing, search, orders, payments.`],
+['e',`Why should you start by understanding the problem statement?`,
+`Requirements define what to build and what scale to design for. Wrong assumptions give a wrong design.`,
+`Ask: "Is it read-heavy? How many users? Do we need real-time updates?"`],
+['m',`How do you break a big problem into sub-problems? Example?`,
+`List the main features and treat each as a sub-problem. Only create a new sub-problem when truly needed, not to over-complicate the design.`,
+`Amazon-like app: product listing, product search, order, payment.`],
+['m',`What four things should you decide for each sub-problem?`,
+`Database, caching, scaling and fault tolerance, and communication (synchronous or asynchronous).`,
+`Order service: SQL for ACID, no cache for writes, multiple instances, REST for payment but events for notifications.`],
+['m',`How do you pick the database for a sub-problem?`,
+`Use SQL for structured, consistency-critical data such as orders and payments, and NoSQL for flexible, massive, low-latency data such as reviews, feeds and locations.`,
+`Product catalogue: document DB. Payments: PostgreSQL.`],
+['m',`When do you add caching in your design?`,
+`When reads dominate and data is reused. Frequently read, rarely changed data is ideal, such as product details or rankings.`,
+`Cache product pages in Redis with a TTL.`],
+['m',`How do you decide between sync and async communication?`,
+`Synchronous when the caller needs the result immediately. Asynchronous through a broker when the work is slow, non-critical or must fan out.`,
+`Payment: sync. Email, inventory, analytics: async events.`],
+['m',`What is the role of estimation in the process?`,
+`A quick estimate of load, storage and servers guides decisions such as whether to shard, add replicas or cache. Spend about 5 minutes.`,
+`1 million reads per second means caching is mandatory.`],
+['h',`How do you handle scale and fault tolerance in your design?`,
+`Stateless services scaled horizontally behind a load balancer with auto scaling, replicated databases, queues to absorb spikes, and no single point of failure.`,
+`Two availability zones, replica DBs, multiple gateway instances.`],
+['h',`How would you structure a 45-minute system design interview?`,
+`Clarify requirements and constraints, do a brief estimate, sketch the high-level design, go deep on key sub-problems (data model, scaling, caching, consistency), discuss trade-offs and bottlenecks, and summarise. Keep communicating your reasoning.`,
+`About 5 min requirements, 5 min estimation, 15 min HLD, 15 min deep dive, 5 min wrap-up.`]
+]});
+
+
+
+(function(){
+const LV={e:'Easy',m:'Medium',h:'Hard'};
+const strip=h=>h.replace(/<[^>]+>/g,' ').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
+const ALL=[];
+T.forEach((t,ti)=>t.q.forEach((x,qi)=>ALL.push({id:ti+'-'+qi,ti,qi,lvl:x[0],q:x[1],a:x[2],ex:x[3],text:strip(x[1]+' '+x[2]+' '+x[3]).toLowerCase()})));
+const BY=Object.fromEntries(ALL.map(x=>[x.id,x]));
+
+/* storage with in-memory fallback */
+const mem={};
+const store={get(k){try{const v=localStorage.getItem(k);return v===null?(mem[k]??null):v}catch(e){return mem[k]??null}},set(k,v){mem[k]=v;try{localStorage.setItem(k,v)}catch(e){}}};
+let known=new Set();
+try{const a=JSON.parse(store.get('sd-known')||'[]');if(Array.isArray(a))a.forEach(i=>BY[i]&&known.add(i))}catch(e){}
+const saveKnown=()=>store.set('sd-known',JSON.stringify([...known]));
+
+let cur=0,lvl='all',quiz=false,hideKnown=false,search='';
+const open=new Set(),revealed=new Set();
+const $=id=>document.getElementById(id);
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* initial topic from hash or storage */
+(function(){
+  const m=/^#topic-(\d+)$/.exec(location.hash||'');
+  let n=m?+m[1]-1:+(store.get('sd-topic')||0);
+  cur=(n>=0&&n<T.length)?n:0;
+  if(store.get('sd-quiz')==='1')quiz=true;
+})();
+
+function topicCounts(ti){const total=T[ti].q.length;let k=0;T[ti].q.forEach((_,qi)=>{if(known.has(ti+'-'+qi))k++});return{k,total}}
+
+function renderRail(){
+  $('topics').innerHTML=T.map((t,i)=>{
+    const c=topicCounts(i);
+    return `<li><button class="t-item" data-t="${i}" ${(!search&&i===cur)?'aria-current="true"':''}>
+      <span class="t-row"><b>${esc(t.t)}</b><small>${c.k}/${c.total}</small></span>
+      <span class="t-bar"><i style="width:${c.k/c.total*100}%"></i></span></button></li>`}).join('');
+}
+function renderOverall(){
+  const n=known.size,tot=ALL.length;
+  $('overallBar').style.width=(n/tot*100)+'%';
+  $('overallTxt').textContent=n+' of '+tot+' marked known';
+}
+function items(){
+  const q=search.trim().toLowerCase();
+  let it=q?ALL.filter(x=>x.text.includes(q)):ALL.filter(x=>x.ti===cur);
+  if(lvl!=='all')it=it.filter(x=>x.lvl===lvl);
+  if(hideKnown)it=it.filter(x=>!known.has(x.id));
+  return it;
+}
+function cardHTML(x,showFrom){
+  const isOpen=open.has(x.id),isK=known.has(x.id),isR=revealed.has(x.id);
+  return `<article class="card ${x.lvl} ${isOpen?'open':''} ${isK?'known':''} ${isR?'revealed':''}" data-id="${x.id}">
+    <button class="qhead" aria-expanded="${isOpen}" data-act="toggle">
+      <span class="qtext">${esc(x.q)}</span>
+      <span class="qmeta"><span class="tick">${isK?'Known':''}</span><span class="lv">${LV[x.lvl]}</span><i class="chev"></i></span>
+      ${showFrom?`<span class="from">${esc(T[x.ti].t)}</span>`:''}
+    </button>
+    <div class="body" ${isOpen?'':'hidden'}>
+      <button class="btn reveal" data-act="reveal">Show answer</button>
+      <div class="answer"><p>${x.a}</p><div class="ex"><b>Example</b>${x.ex}</div></div>
+      <div class="foot"><button class="known-btn" data-act="known" aria-pressed="${isK}">${isK?'Marked as known':'Mark as known'}</button></div>
+    </div></article>`;
+}
+function renderList(){
+  const q=search.trim();
+  const it=items();
+  document.body.classList.toggle('quiz',quiz);
+  if(q){
+    $('topicTitle').textContent='Search results';
+    $('topicMeta').textContent=it.length+(it.length===1?' question matches ':' questions match ')+'“'+q+'” across all topics.';
+  }else{
+    const c=topicCounts(cur);
+    $('topicTitle').textContent=T[cur].t;
+    $('topicMeta').textContent=c.total+' questions, '+c.k+' marked known'+(lvl!=='all'?'. Showing '+LV[lvl].toLowerCase()+' only':'')+'.';
+  }
+  $('list').innerHTML=it.length?it.map(x=>cardHTML(x,!!q)).join(''):
+    `<div class="empty">${q?'No questions match your search. Try a shorter keyword like “cache” or “shard”.':(hideKnown?'Every question here is marked known. Turn off “Hide known” to review them.':'No questions at this difficulty in this topic. Choose another level.')}</div>`;
+  renderNav();
+}
+function renderNav(){
+  if(search.trim()){$('nav').innerHTML='';return}
+  const p=cur>0?`<button class="btn" data-go="${cur-1}">Previous: ${esc(T[cur-1].t)}</button>`:'<span></span>';
+  const n=cur<T.length-1?`<button class="btn primary" data-go="${cur+1}">Next: ${esc(T[cur+1].t)}</button>`:'';
+  $('nav').innerHTML=p+n;
+}
+function renderAll(){renderRail();renderOverall();renderList()}
+function selectTopic(i,scroll){
+  cur=i;search='';$('search').value='';
+  store.set('sd-topic',String(i));
+  try{history.replaceState(null,'','#topic-'+(i+1))}catch(e){}
+  document.body.classList.remove('rail-open');
+  renderAll();
+  if(scroll!==false)window.scrollTo({top:0});
+}
+
+/* events */
+$('topics').addEventListener('click',e=>{const b=e.target.closest('[data-t]');if(b)selectTopic(+b.dataset.t)});
+$('nav').addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)selectTopic(+b.dataset.go)});
+$('list').addEventListener('click',e=>{
+  const a=e.target.closest('[data-act]');if(!a)return;
+  const card=a.closest('.card'),id=card.dataset.id;
+  if(a.dataset.act==='toggle'){
+    const o=!open.has(id);o?open.add(id):open.delete(id);
+    card.classList.toggle('open',o);a.setAttribute('aria-expanded',o);card.querySelector('.body').hidden=!o;
+  }else if(a.dataset.act==='reveal'){
+    revealed.add(id);card.classList.add('revealed');
+  }else if(a.dataset.act==='known'){
+    known.has(id)?known.delete(id):known.add(id);saveKnown();
+    if(hideKnown){renderAll();return}
+    const k=known.has(id);
+    card.classList.toggle('known',k);
+    card.querySelector('.tick').textContent=k?'Known':'';
+    a.textContent=k?'Marked as known':'Mark as known';a.setAttribute('aria-pressed',k);
+    renderRail();renderOverall();
+    if(!search.trim()){const c=topicCounts(cur);$('topicMeta').textContent=c.total+' questions, '+c.k+' marked known'+(lvl!=='all'?'. Showing '+LV[lvl].toLowerCase()+' only':'')+'.'}
+  }
+});
+let st;$('search').addEventListener('input',e=>{clearTimeout(st);st=setTimeout(()=>{search=e.target.value;renderRail();renderList()},120)});
+document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{
+  lvl=c.dataset.lvl;document.querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed',x===c));renderList()}));
+function setSw(el,v){el.setAttribute('aria-checked',v)}
+$('quizSw').addEventListener('click',()=>{quiz=!quiz;setSw($('quizSw'),quiz);store.set('sd-quiz',quiz?'1':'0');if(!quiz)revealed.clear();renderList()});
+$('hideSw').addEventListener('click',()=>{hideKnown=!hideKnown;setSw($('hideSw'),hideKnown);renderList()});
+$('expandBtn').addEventListener('click',()=>{items().forEach(x=>open.add(x.id));renderList()});
+$('collapseBtn').addEventListener('click',()=>{items().forEach(x=>open.delete(x.id));renderList()});
+$('menuBtn').addEventListener('click',()=>document.body.classList.add('rail-open'));
+$('scrim').addEventListener('click',()=>document.body.classList.remove('rail-open'));
+
+/* theme */
+function effTheme(){const d=document.documentElement.getAttribute('data-theme');if(d)return d;return(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light'}
+function syncThemeBtn(){$('themeBtn').textContent=effTheme()==='dark'?'Light mode':'Dark mode'}
+$('themeBtn').addEventListener('click',()=>{const n=effTheme()==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);store.set('sd-theme',n);syncThemeBtn()});
+const th=store.get('sd-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th);
+syncThemeBtn();
+
+/* reset */
+let rt;$('resetBtn').addEventListener('click',e=>{
+  const b=e.currentTarget;
+  if(b.dataset.arm){clearTimeout(rt);known.clear();saveKnown();b.dataset.arm='';b.textContent='Reset progress';renderAll();return}
+  b.dataset.arm='1';b.textContent='Click again to clear all progress';
+  rt=setTimeout(()=>{b.dataset.arm='';b.textContent='Reset progress'},3500);
+});
+
+/* drill */
+let deck=[],di=0,shown=false,got=0,miss=[],lastFocus=null;
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function startDrill(list){
+  if(!list.length){return}
+  lastFocus=document.activeElement;
+  deck=shuffle(list.slice());di=0;shown=false;got=0;miss=[];
+  $('drill').hidden=false;document.body.style.overflow='hidden';
+  drawDrill();
+}
+function closeDrill(){$('drill').hidden=true;document.body.style.overflow='';renderAll();if(lastFocus&&lastFocus.focus)lastFocus.focus()}
+function drawDrill(){
+  const d=$('drill');
+  if(di>=deck.length){
+    d.innerHTML=`<div class="dcard"><div class="dsum"><h3>Round complete</h3>
+      <p>${got} of ${deck.length} marked known${miss.length?', '+miss.length+' to review':''}.</p>
+      <div class="dbtns" style="justify-content:center">${miss.length?`<button class="btn primary" id="dMiss">Drill the ${miss.length} missed</button>`:''}<button class="btn ${miss.length?'':'primary'}" id="dClose">Close</button></div></div></div>`;
+    $('dClose').onclick=closeDrill;
+    if($('dMiss'))$('dMiss').onclick=()=>{const m=miss.slice();deck=shuffle(m);di=0;shown=false;got=0;miss=[];drawDrill()};
+    ($('dMiss')||$('dClose')).focus();return;
+  }
+  const x=deck[di];
+  d.innerHTML=`<div class="dcard ${x.lvl}">
+    <div class="dtop"><span>Card ${di+1} of ${deck.length} · ${esc(T[x.ti].t)} · <b style="color:var(--c)">${LV[x.lvl]}</b></span><button class="btn small" id="dExit">Exit</button></div>
+    <p class="dq">${esc(x.q)}</p>
+    ${shown?`<div class="answer"><p>${x.a}</p><div class="ex"><b>Example</b>${x.ex}</div></div>
+      <div class="dbtns"><button class="btn primary" id="dGot">I knew it</button><button class="btn" id="dAgain">Review later</button></div>`
+      :`<div class="dbtns"><button class="btn primary" id="dShow">Show answer</button><button class="btn" id="dSkip">Skip</button></div>`}
+  </div>`;
+  $('dExit').onclick=closeDrill;
+  if(shown){
+    $('dGot').onclick=()=>{known.add(x.id);saveKnown();got++;di++;shown=false;drawDrill()};
+    $('dAgain').onclick=()=>{miss.push(x);di++;shown=false;drawDrill()};
+    $('dGot').focus();
+  }else{
+    $('dShow').onclick=()=>{shown=true;drawDrill()};
+    $('dSkip').onclick=()=>{di++;drawDrill()};
+    $('dShow').focus();
+  }
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('drill').hidden)closeDrill();else document.body.classList.remove('rail-open')}});
+$('drillTopic').addEventListener('click',()=>{
+  const all=ALL.filter(x=>x.ti===cur);const unk=all.filter(x=>!known.has(x.id));
+  startDrill(unk.length?unk:all);
+});
+$('drillAll').addEventListener('click',()=>{
+  const unk=ALL.filter(x=>!known.has(x.id));
+  startDrill(unk);
+  if(!unk.length)$('drillAll').textContent='Everything is marked known';
+});
+
+if(quiz)setSw($('quizSw'),true);
+renderAll();
+})();
+</script>
+</body>
+</html>
