@@ -12,8 +12,10 @@ a { color: inherit; }
 .brand { align-items: center; display: flex; font-family: var(--mono); font-size: 13px; font-weight: 500; gap: 10px; letter-spacing: .08em; text-decoration: none; }
 .brand i, .status-dot { background: var(--accent); border-radius: 50%; display: block; height: 8px; width: 8px; }
 .site-nav { align-items: center; display: flex; font-family: var(--mono); font-size: 11px; gap: clamp(18px, 3vw, 42px); letter-spacing: .05em; text-transform: uppercase; }
-.site-nav a { text-decoration: none; transition: color .2s ease; }
-.site-nav a:hover, footer a:hover { color: var(--accent-dark); }
+.site-nav a, .site-nav button { font: inherit; letter-spacing: inherit; text-transform: inherit; }
+.site-nav a, .site-nav .prep-link { text-decoration: none; transition: color .2s ease; }
+.site-nav a:hover, .site-nav .prep-link:hover, footer a:hover { color: var(--accent-dark); }
+.site-nav .prep-link { background: transparent; border: 0; color: inherit; cursor: pointer; padding: 0; }
 .nav-cta { border-bottom: 1px solid currentColor; padding-bottom: 3px; }
 .nav-cta span, .button span { font-size: 17px; margin-left: 7px; }
 .theme-toggle { align-items: center; background: transparent; border: 1px solid var(--line); border-radius: 50%; color: var(--ink); cursor: pointer; display: inline-flex; font-family: var(--display); height: 30px; justify-content: center; margin-left: 4px; padding: 0; transition: border-color .2s ease, color .2s ease, transform .2s ease; width: 30px; }

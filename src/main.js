@@ -68,6 +68,20 @@ const projects = [
 ];
 
 const app = document.querySelector('#app');
+const PREP_PASSWORD = 'Prep2026!';
+const PREP_UNLOCK_KEY = 'prepUnlocked';
+
+const isPrepUnlocked = () => localStorage.getItem(PREP_UNLOCK_KEY) === 'true';
+
+const renderPrepNav = () => {
+  const prepButton = document.querySelector('[data-prep-link]');
+  if (!prepButton) return;
+
+  const unlocked = isPrepUnlocked();
+  prepButton.textContent = unlocked ? 'System Design Interview Prep' : 'Prep';
+  prepButton.setAttribute('aria-label', unlocked ? 'Open System Design Interview Prep' : 'Unlock System Design Interview Prep');
+  prepButton.dataset.unlocked = String(unlocked);
+};
 
 const renderList = (items, className, renderItem) => items.map((item) => renderItem(item)).join('');
 
@@ -77,7 +91,7 @@ app.innerHTML = `
       <a class="brand" href="#top" aria-label="Frank Solomon Marvelous home"><span>FSM</span><i></i></a>
       <button class="menu-toggle" aria-expanded="false" aria-controls="site-nav"><span></span><span></span><span></span><b class="sr-only">Toggle navigation</b></button>
       <nav id="site-nav" class="site-nav" aria-label="Primary navigation">
-        <a href="#about">About</a><a href="#experience">Experience</a><a href="#skills">Skills</a><a href="#work">Work</a><a href="/system-design-interview-prep/">System Design Interview Prep</a><a href="#contact" class="nav-cta">Let's talk <span>↗</span></a><button class="theme-toggle" type="button" aria-label="Switch to dark mode" title="Switch to dark mode"><span class="theme-icon" aria-hidden="true">☾</span></button>
+        <a href="#about">About</a><a href="#experience">Experience</a><a href="#skills">Skills</a><a href="#work">Work</a><button type="button" class="prep-link" data-prep-link="true">Prep</button><a href="#contact" class="nav-cta">Let's talk <span>↗</span></a><button class="theme-toggle" type="button" aria-label="Switch to dark mode" title="Switch to dark mode"><span class="theme-icon" aria-hidden="true">☾</span></button>
       </nav>
     </header>
 
@@ -111,8 +125,36 @@ document.querySelector('#year').textContent = new Date().getFullYear();
 
 const menuToggle = document.querySelector('.menu-toggle');
 const nav = document.querySelector('#site-nav');
+const prepButton = document.querySelector('[data-prep-link]');
 const themeToggle = document.querySelector('.theme-toggle');
 const themeIcon = document.querySelector('.theme-icon');
+
+const openPrepPage = () => {
+  window.location.href = '/system-design-interview-prep/';
+};
+
+const handlePrepAccess = () => {
+  if (isPrepUnlocked()) {
+    renderPrepNav();
+    openPrepPage();
+    return;
+  }
+
+  const enteredPassword = window.prompt('Enter the password to unlock the System Design Interview Prep page');
+  if (enteredPassword === null) return;
+
+  if (enteredPassword === PREP_PASSWORD) {
+    localStorage.setItem(PREP_UNLOCK_KEY, 'true');
+    renderPrepNav();
+    openPrepPage();
+    return;
+  }
+
+  window.alert('Incorrect password.');
+};
+
+prepButton?.addEventListener('click', handlePrepAccess);
+renderPrepNav();
 
 const updateThemeToggle = () => {
   const isDark = document.documentElement.dataset.theme === 'dark';

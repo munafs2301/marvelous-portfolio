@@ -63,6 +63,7 @@ sup{font-size:.7em}
   .home-link:hover{background:var(--surface);}
   .home-link .arrow{font-size:1.1rem;line-height:1}
 
+
 /* shell */
 .shell{max-width:1240px;margin:0 auto;padding:0 24px 64px;display:grid;grid-template-columns:292px minmax(0,1fr);gap:28px;align-items:start}
 #rail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);max-height:calc(100dvh - 24px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:8px;display:flex;flex-direction:column}
@@ -128,6 +129,31 @@ main{min-width:0}
 .empty{padding:36px 8px;color:var(--muted);text-align:center;border:1px dashed var(--line);border-radius:8px}
 .nav{display:flex;justify-content:space-between;gap:10px;margin-top:20px;flex-wrap:wrap}
 
+
+/* diagrams */
+.fig{margin:2px 0 14px;max-width:560px}
+.fig svg{display:block;width:100%;height:auto;background:var(--surface);border:1px solid var(--line);border-radius:6px}
+.fig figcaption{font-size:.8rem;color:var(--muted);margin-top:5px}
+svg .n{fill:var(--surface2);stroke:var(--muted);stroke-width:1.2}
+svg .a{fill:color-mix(in srgb,var(--accent) 16%,var(--surface));stroke:var(--accent)}
+svg .g{fill:color-mix(in srgb,var(--known) 16%,var(--surface));stroke:var(--known)}
+svg .w{fill:color-mix(in srgb,var(--m) 20%,var(--surface));stroke:var(--m)}
+svg .r{fill:color-mix(in srgb,var(--h) 16%,var(--surface));stroke:var(--h)}
+svg .d{fill:none;stroke-dasharray:4 3}
+svg text{font-family:var(--sans);font-size:12px;fill:var(--ink)}
+svg text.s{font-size:10.5px;fill:var(--muted)}
+svg text.b{font-weight:600}
+svg text.ta{fill:var(--accent)} svg text.tg{fill:var(--known)} svg text.tr{fill:var(--h)}
+svg .ln{stroke:var(--muted);stroke-width:1.2;fill:none}
+svg .ln.acc{stroke:var(--accent);stroke-width:2} svg .ln.grn{stroke:var(--known);stroke-width:2} svg .ln.red{stroke:var(--h);stroke-width:2}
+svg .ln.dash,svg .ar.dash{stroke-dasharray:5 4}
+svg .ar{fill:none;stroke:var(--muted);stroke-width:1.5;marker-end:url(#ah)}
+svg .ar.acc{stroke:var(--accent);marker-end:url(#ahA)}
+svg .ar.grn{stroke:var(--known);marker-end:url(#ahG)}
+svg .ar.red{stroke:var(--h);marker-end:url(#ahR)}
+svg .ar.bi{marker-start:url(#ah)}
+svg .ar.acc.bi{marker-start:url(#ahA)}
+
 /* drill */
 .drill{position:fixed;inset:0;z-index:30;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 16px) 16px calc(env(safe-area-inset-bottom,0px) + 16px)}
 .drill[hidden]{display:none}
@@ -153,12 +179,18 @@ main{min-width:0}
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--muted)"/></marker>
+<marker id="ahA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--accent)"/></marker>
+<marker id="ahG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--known)"/></marker>
+<marker id="ahR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--h)"/></marker>
+</defs></svg>
 <header class="top">
-  <div class="actions" style="justify-content:flex-start; margin-bottom: 8px;">
+    <div class="actions" style="justify-content:flex-start; margin-bottom: 8px;">
     <a class="btn home-link" href="/" aria-label="Back to home page"><span class="arrow">←</span> Back to home</a>
   </div>
   <h1>System design interview prep</h1>
-  <p>Questions and worked answers for every topic in the System Design for Beginners guide, each with a concrete example. Open a card to read the answer, or switch on quiz mode and try answering first.</p>
+  <p>Questions and worked answers for every topic in the System Design for Beginners guide, each with a concrete example and, where it helps, a diagram. Open a card to read the answer, or switch on quiz mode and try answering first.</p>
   <div class="topbar">
     <div class="overall" aria-live="polite"><div class="meter"><i id="overallBar"></i></div><span id="overallTxt"></span></div>
     <div class="actions">
@@ -1163,6 +1195,738 @@ T.push({t:`How to solve any system design problem`,q:[
 `About 5 min requirements, 5 min estimation, 15 min HLD, 15 min deep dive, 5 min wrap-up.`]
 ]});
 
+const G={};
+const tx=(x,y,s,c='t',a='middle')=>{const l=String(s).split('\n'),y0=y-(l.length-1)*7.5;return `<text class="${c}" text-anchor="${a}" dominant-baseline="central">`+l.map((t,i)=>`<tspan x="${x}" y="${y0+i*15}">${t}</tspan>`).join('')+'</text>'};
+const bx=(x,y,w,h,s,c='')=>`<rect class="n ${c}" x="${x}" y="${y}" width="${w}" height="${h}" rx="6"/>`+tx(x+w/2,y+h/2,s);
+const ar=(x1,y1,x2,y2,c='')=>`<line class="ar ${c}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
+const ln=(x1,y1,x2,y2,c='')=>`<line class="ln ${c}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
+const pa=(d,c='')=>`<path class="ar ${c}" d="${d}"/>`;
+const cv=(d,c='')=>`<path class="ln ${c}" d="${d}"/>`;
+const db=(x,y,w,h,s,c='')=>{const r=7;return `<path class="n ${c}" d="M${x} ${y+r}v${h-2*r}a${w/2} ${r} 0 0 0 ${w} 0v${-(h-2*r)}a${w/2} ${r} 0 0 0 ${-w} 0z"/><ellipse class="n ${c}" cx="${x+w/2}" cy="${y+r}" rx="${w/2}" ry="${r}"/>`+tx(x+w/2,y+h/2+4,s)};
+const cc=(x,y,r,s,c='')=>`<circle class="n ${c}" cx="${x}" cy="${y}" r="${r}"/>`+tx(x,y,s);
+const rc=(x,y,w,h,c='d')=>`<rect class="n ${c}" x="${x}" y="${y}" width="${w}" height="${h}" rx="8"/>`;
+const seq=(xs,names,H,msgs)=>xs.map((x,i)=>bx(x-44,4,88,28,names[i])+ln(x,32,x,H,'dash')).join('')+msgs.map(([a,b,y,s,c])=>ar(xs[a],y,xs[b],y,c||'')+tx((xs[a]+xs[b])/2,y-9,s,'s')).join('');
+const fig=(k,w,h,inner,cap)=>{G[k]=`<figure class="fig"><svg viewBox="-3 -3 ${w+6} ${h+6}" role="img" aria-label="${cap}">${inner}</svg><figcaption>${cap}</figcaption></figure>`};
+
+/* ---------- Topic 1 ---------- */
+fig('basic',480,125,
+ bx(10,40,90,40,'Client')+ar(100,60,185,60)+bx(185,40,100,40,'Backend\n(NodeJS)')+ar(285,60,370,60)+db(370,32,90,56,'Database')+
+ tx(240,108,'Fine for a prototype. With millions of users this single path chokes.','s'),
+ 'The simple architecture: one client path, one backend, one database');
+
+fig('spof',480,160,
+ tx(110,12,'Before: single point of failure','s')+tx(365,12,'After: redundancy','s')+
+ bx(10,60,70,36,'App')+ar(80,78,135,78)+db(135,48,80,60,'DB\nfails = outage','r')+
+ ln(240,25,240,150,'dash')+
+ bx(265,60,70,36,'App')+ar(335,70,385,45)+ar(335,86,385,115,'dash')+
+ db(385,26,85,46,'Primary')+db(385,96,85,46,'Replica','g')+ar(427,72,427,98,'acc'),
+ 'Replication removes the single point of failure');
+
+fig('prodarch',520,190,
+ tx(110,12,'Prototype','t b')+tx(375,12,'Production','t b')+
+ bx(5,84,52,32,'Client')+ar(57,100,80,100)+bx(80,84,56,32,'App')+ar(136,100,160,100)+db(160,76,55,48,'DB')+
+ ln(230,24,230,180,'dash')+
+ bx(240,84,52,32,'Client')+ar(292,100,306,100)+bx(306,84,40,32,'LB','a')+
+ bx(364,30,56,28,'App')+bx(364,86,56,28,'App')+bx(364,142,56,28,'App')+
+ ar(346,96,364,44)+ar(346,100,364,100)+ar(346,104,364,156)+
+ bx(444,30,68,28,'Redis','w')+db(444,78,68,42,'Primary')+db(444,134,68,42,'Replica','g')+
+ ar(420,44,444,44)+ar(420,100,444,100)+ar(420,156,444,156),
+ 'Prototype versus production architecture');
+
+{const names=['Index','Scale\nup','Partition','Read\nreplicas','Multi-\nmaster','Shard'],cs=['g','g','a','a','w','r'];
+let s=tx(240,12,'Simpler and cheaper  →  more complex and costly','s');
+names.forEach((n,i)=>{const h=44+i*18;s+=bx(8+i*78,185-h,72,h,n,cs[i])});
+fig('scalestep',480,195,s,'Try each scaling step before moving to the next, harder one')}
+
+/* ---------- Topic 2 ---------- */
+fig('dnsflow',480,200,
+ seq([70,240,410],['Browser','DNS','Server'],195,[[0,1,70,'1  abc.com ?'],[1,0,100,'2  IP 35.154.33.64','acc dash'],[0,2,145,'3  request to IP:443'],[2,0,175,'4  response','acc dash']]),
+ 'DNS turns the domain into an IP, then the browser calls the server');
+
+fig('portmux',480,180,
+ bx(5,70,56,36,'Client')+ar(61,88,108,88,'acc')+tx(86,72,':8081','s ta')+
+ rc(90,10,380,160)+tx(280,25,'One server  35.154.33.64','s')+
+ bx(110,60,100,56,'Admin app\n:8081','a')+bx(230,60,100,56,'Web app\n:443')+bx(350,60,100,56,'Database\n:5432')+
+ tx(280,148,'The port number picks the application','s'),
+ 'The IP finds the machine, the port finds the application');
+
+fig('deploy',480,155,
+ bx(10,22,100,48,'Your laptop\napp on :8080','d')+ar(110,46,270,62,'acc')+tx(190,40,'deploy code','s ta')+
+ rc(250,6,220,124)+tx(360,20,'Cloud provider (AWS)','s')+bx(270,42,180,58,'EC2 instance\npublic IP 35.154.33.64','a')+
+ bx(10,100,100,34,'Users')+ar(110,117,270,92)+tx(190,118,'https://public-ip','s'),
+ 'Deployment puts your code on a cloud VM that has a public IP');
+
+/* ---------- Topic 3 ---------- */
+fig('latthru',480,160,
+ tx(115,14,'Latency','t b')+tx(115,30,'one car, A to B','s')+
+ ln(30,75,200,75)+cc(30,75,9,'A')+cc(200,75,9,'B')+bx(95,66,30,18,'','a')+ar(130,75,176,75,'acc')+tx(115,108,'10 minutes','t b')+
+ ln(240,20,240,150,'dash')+
+ tx(360,14,'Throughput','t b')+tx(360,30,'cars per hour','s')+
+ ln(260,55,470,55)+ln(260,80,470,80)+ln(260,105,470,105)+
+ bx(268,60,18,14,'','g')+bx(300,60,18,14,'','g')+bx(340,60,18,14,'','g')+bx(395,60,18,14,'','g')+
+ bx(280,85,18,14,'','g')+bx(325,85,18,14,'','g')+bx(370,85,18,14,'','g')+bx(430,85,18,14,'','g')+
+ tx(360,132,'1,000 cars / hour','t b'),
+ 'Latency is time for one trip; throughput is trips completed per hour');
+
+fig('rtt',480,155,
+ seq([100,380],['Client','Server'],150,[[0,1,70,'request: 40 ms'],[1,0,105,'response: 40 ms','acc dash']])+
+ tx(240,138,'RTT = 40 + 40 = 80 ms','t b'),
+ 'Round trip time is request plus response');
+
+/* ---------- Topic 4 ---------- */
+fig('vh',480,180,
+ tx(120,12,'Vertical: a bigger machine','s')+tx(370,12,'Horizontal: more machines','s')+
+ bx(20,100,64,44,'4 GB\n2 CPU')+ar(84,122,120,100,'acc')+bx(120,40,100,104,'64 GB\n16 CPU','a')+
+ ln(240,25,240,170,'dash')+
+ bx(270,80,50,36,'LB','a')+bx(360,28,100,34,'Server 1')+bx(360,80,100,34,'Server 2')+bx(360,132,100,34,'Server 3')+
+ ar(320,92,360,45)+ar(320,98,360,97)+ar(320,104,360,149),
+ 'Scale up one machine, or scale out across many');
+
+fig('lbscale',480,170,
+ bx(10,60,90,50,'8 clients')+ar(100,85,170,85)+bx(170,58,80,54,'Load\nbalancer','a')+
+ ar(250,75,340,45)+ar(250,95,340,125)+
+ bx(340,20,120,46,'Machine 1\n4 clients')+bx(340,102,120,46,'Machine 2\n4 clients')+
+ tx(240,158,'Clients only know the load balancer','s'),
+ 'The load balancer is the single entry point for horizontal scaling');
+
+/* ---------- Topic 5 ---------- */
+fig('autoscale',480,175,
+ ln(40,20,40,150)+ln(40,150,470,150)+tx(255,166,'time','s')+tx(20,85,'load','s')+
+ cv('M40 130 C100 128 130 40 200 40 S300 120 360 128 S440 132 470 128','acc')+
+ cv('M40 130 H110 V100 H165 V60 H250 V100 H310 V130 H470','grn dash')+
+ tx(330,12,'traffic','s ta','start')+tx(390,12,'servers','s tg','start')+
+ tx(165,52,'scale out','s tg')+tx(310,92,'scale in','s tg'),
+ 'Servers follow traffic automatically: out when busy, in when quiet');
+
+fig('asg',480,165,
+ bx(5,70,60,36,'Clients')+ar(65,88,95,88)+bx(95,70,60,36,'Load\nbalancer','a')+ar(155,88,205,88)+
+ rc(200,45,270,100)+tx(335,58,'Auto scaling group','s')+
+ bx(212,72,56,34,'EC2')+bx(278,72,56,34,'EC2')+bx(344,72,56,34,'EC2')+bx(410,72,52,34,'new','g d')+
+ bx(200,2,270,28,'CPU above 90% for 5 min → launch one more','w')+ar(335,30,335,48,'acc'),
+ 'A metric crosses a threshold and the group launches another instance');
+
+/* ---------- Topic 6 ---------- */
+fig('botepipe',520,110,
+ bx(0,10,160,88,'Load\n100M DAU\n10 tweets per user\n= 1B writes/day')+ar(160,54,180,54)+
+ bx(180,10,160,88,'Storage\n500 B × 1B = 0.5 TB\n10% photos × 2 MB\n≈ 200 TB/day','a')+ar(340,54,360,54)+
+ bx(360,10,160,88,'Resources\n10K req/s × 10 ms\n= 100 cores\n÷ 4 = 25 servers'),
+ 'Estimate load, then storage, then servers');
+
+fig('servercalc',520,95,
+ bx(0,15,112,50,'10,000 req/s\n× 10 ms each')+ar(112,40,136,40)+
+ bx(136,15,112,50,'100,000 ms of\nCPU per second')+ar(248,40,272,40)+tx(260,76,'÷ 1,000','s')+
+ bx(272,15,112,50,'100 cores','a')+ar(384,40,408,40)+tx(396,76,'÷ 4','s')+
+ bx(408,15,112,50,'25 servers','g'),
+ 'From requests per second to a server count');
+
+fig('twitterstore',480,120,
+ tx(10,18,'Tweet text  ≈ 0.5 TB / day','s','start')+`<rect class="n g" x="10" y="30" width="3" height="18"/>`+
+ tx(10,68,'Photos  ≈ 200 TB / day','s','start')+`<rect class="n r" x="10" y="80" width="450" height="22" rx="3"/>`+
+ tx(235,91,'photos dominate storage → blob storage + CDN','t'),
+ 'Photos dominate the storage estimate');
+
+/* ---------- Topic 7 ---------- */
+fig('captri',480,222,
+ `<polygon class="n" points="240,28 60,172 420,172" style="fill:none"/>`+
+ cc(240,28,20,'C','a')+cc(60,172,20,'A','a')+cc(420,172,20,'P','a')+
+ tx(268,28,'Consistency','t b','start')+tx(60,204,'Availability','t b')+tx(420,204,'Partition\ntolerance','t b')+
+ tx(124,96,'CA','t b','end')+tx(124,111,'unrealistic','s','end')+
+ tx(356,96,'CP','t b','start')+tx(356,111,'banking, payments','s','start')+
+ tx(240,138,'AP','t b')+tx(240,154,'social media, likes','s'),
+ 'Partitions will happen, so the real choice is CP or AP');
+
+fig('partition',480,250,
+ bx(40,25,70,34,'Node A')+bx(40,105,70,34,'Node C')+ln(75,59,75,105,'grn')+
+ bx(340,65,70,34,'Node B')+
+ ar(110,40,340,78,'red dash')+ar(110,122,340,86,'red dash')+tx(225,82,'✂ network partition','s tr')+
+ bx(20,178,210,50,'Keep serving B\n→ users may see stale data (AP)','w')+bx(250,178,210,50,'Pause B until healed\n→ some requests fail (CP)','a')+
+ ar(360,99,140,178,'dash')+ar(380,99,355,178,'dash'),
+ 'During a partition you must trade consistency for availability or the reverse');
+
+fig('nodes3',480,150,
+ tx(240,12,'Same data replicated on every node','s')+
+ db(30,45,90,60,'Delhi')+db(195,45,90,60,'Mumbai','a')+db(360,45,90,60,'Chennai')+
+ ar(120,75,195,75,'acc bi')+ar(285,75,360,75,'acc bi')+
+ tx(240,128,'A write to one node is replicated to the others','s'),
+ 'Nodes in different places hold copies of the same data');
+
+/* ---------- Topic 8 ---------- */
+fig('btree',480,180,
+ tx(80,14,'Full table scan  O(N)','t b')+
+ bx(20,30,120,22,'id 1')+bx(20,58,120,22,'id 2')+bx(20,86,120,22,'…')+bx(20,114,120,22,'id 4','a')+bx(20,142,120,22,'id N')+
+ ar(10,41,10,125,'red')+
+ ln(180,20,180,170,'dash')+
+ tx(340,14,'B-tree index  O(log N)','t b')+
+ bx(305,30,70,26,'50','a')+bx(235,82,70,26,'25','a')+bx(375,82,70,26,'75')+bx(205,134,64,26,'4 ✓','g')+bx(285,134,64,26,'…')+
+ ar(330,56,285,82,'acc')+ar(350,56,395,82)+ar(255,108,240,134,'acc')+ar(285,108,310,134),
+ 'A scan reads every row; an index jumps straight to the row');
+
+fig('partitioning',480,145,
+ bx(10,50,80,44,'users\n(huge table)')+ar(90,72,150,72)+
+ rc(150,8,320,128)+tx(310,22,'One database server','s')+
+ bx(165,45,90,52,'users_1\nids 1–1000','a')+bx(265,45,90,52,'users_2\nids 1001–2000','a')+bx(365,45,90,52,'users_3\nids 2001–3000','a')+
+ tx(310,118,'Each partition has its own, smaller index','s'),
+ 'Partitioning splits one table into smaller tables on the same server');
+
+fig('masterslave',480,170,
+ bx(10,70,60,36,'App')+
+ bx(180,10,100,36,'Master','a')+ar(70,78,180,34,'acc')+tx(105,46,'writes','s ta')+
+ bx(370,10,100,34,'Replica 1')+bx(370,62,100,34,'Replica 2')+bx(370,114,100,34,'Replica 3')+
+ ar(280,28,370,27,'acc dash')+ar(280,32,370,79,'acc dash')+ar(280,36,370,131,'acc dash')+tx(325,12,'replicate','s ta')+
+ ar(70,98,370,96,'grn')+tx(200,110,'reads (to the least busy replica)','s tg'),
+ 'Writes go to the master; reads are spread over replicas');
+
+fig('multimaster',480,140,
+ bx(10,20,100,36,'North India\nusers')+bx(10,84,100,36,'South India\nusers')+
+ ar(110,38,185,38)+ar(110,102,185,102)+
+ db(185,14,90,50,'Master N','a')+db(185,78,90,50,'Master S','a')+
+ pa('M275 39 H330 V103 H275','acc bi')+tx(405,71,'sync both ways\nconflicts must be\nresolved by your rules','s'),
+ 'Several masters accept writes and sync with each other');
+
+fig('sharding',480,195,
+ bx(10,80,60,36,'App')+ar(70,98,100,98)+bx(100,72,100,52,'Routing logic\nshard = id range','w')+
+ ar(200,88,290,34)+ar(200,98,290,98)+ar(200,108,290,162)+
+ db(290,8,110,52,'Shard 1\nids 1–1000')+db(290,72,110,52,'Shard 2\nids 1001–2000')+db(290,136,110,52,'Shard 3\nids 2001–3000')+
+ tx(435,98,'each shard\nis its own\nserver','s'),
+ 'Sharding spreads a table over different servers; your app routes to them');
+
+{const P=(x,y,t,a,b,n)=>rc(x,y,230,88,'n')+tx(x+115,y+14,t,'t b')+a+tx(x+115,y+76,n,'s');
+fig('shardstrat',480,195,
+ P(5,5,'Range',bx(15,30,66,28,'1–1000')+bx(87,30,66,28,'1001–2K')+bx(159,30,66,28,'2001–3K'),'','simple · skew can overload one')+
+ P(245,5,'Hash',tx(360,38,'hash(id) % 3','t')+bx(265,52,60,22,'0')+bx(335,52,60,22,'1')+bx(405,52,60,22,'2'),'','even · hard to add shards')+
+ P(5,102,'Geographic',bx(15,127,66,28,'America')+bx(87,127,66,28,'Europe')+bx(159,127,66,28,'Asia'),'','local · hotspots')+
+ P(245,102,'Directory',bx(255,127,70,28,'lookup\ntable','w')+ar(325,141,360,141)+bx(360,127,100,28,'which shard?'),'','flexible · directory can bottleneck'),
+ 'Four ways to decide which shard owns a row')}
+
+/* ---------- Topic 9 ---------- */
+fig('acid',480,150,
+ rc(5,10,470,100,'n d')+tx(240,24,'One transaction','s')+
+ bx(25,45,150,48,'Account A\n₹1000 → ₹500')+ar(175,69,305,69,'acc')+tx(240,58,'move ₹500','s ta')+bx(305,45,150,48,'Account B\n₹200 → ₹700','g')+
+ tx(240,132,'Atomicity: if the credit fails, the debit is rolled back','s'),
+ 'ACID in one picture: both steps happen or neither does');
+
+{const glyph=(i,x)=>[
+ `<path class="ln" d="M${x-14} 14h28v18h-28zM${x-14} 20h28M${x-14} 26h28M${x} 14v18"/>`,
+ tx(x,23,'{ }','t b'),
+ tx(x,23,'k → v','s'),
+ `<path class="ln" d="M${x-12} 32v-14M${x-4} 32v-8M${x+4} 32v-18M${x+12} 32v-10"/>`,
+ `<circle class="n" cx="${x-12}" cy="30" r="4"/><circle class="n" cx="${x+12}" cy="30" r="4"/><circle class="n" cx="${x}" cy="15" r="4"/><path class="ln" d="M${x-10} 27L${x-2} 18M${x+10} 27L${x+2} 18M${x-8} 30h16"/>`][i];
+const nm=[['SQL','tables','Postgres'],['Document','JSON','MongoDB'],['Key-value','key → value','Redis'],['Column','by column','Cassandra'],['Graph','relations','Neo4j']];
+let s='';nm.forEach((n,i)=>{const x=5+i*95;s+=`<rect class="n ${i?'a':'w'}" x="${x}" y="8" width="88" height="104" rx="6"/>`+glyph(i,x+44)+tx(x+44,58,n[0],'t b')+tx(x+44,75,n[1],'s')+tx(x+44,98,n[2],'s')});
+fig('sqlnosql',480,122,s,'SQL stores tables; NoSQL comes in four shapes')}
+
+fig('polyglot',480,190,
+ bx(190,72,100,46,'E-commerce\napp','a')+
+ db(15,12,140,50,'PostgreSQL\norders · payments')+db(325,12,140,50,'MongoDB\ncatalogue · reviews')+
+ db(15,128,140,50,'Redis\ncache · sessions','w')+bx(325,132,140,46,'S3\nimages · videos','g')+
+ ar(190,84,155,50,'bi')+ar(290,84,325,50,'bi')+ar(190,108,155,140,'bi')+ar(290,108,325,148,'bi'),
+ 'Each kind of data goes to the store that suits it');
+
+/* ---------- Topic 10 ---------- */
+fig('monomicro',480,170,
+ tx(100,12,'Monolith','t b')+tx(365,12,'Microservices','t b')+
+ rc(10,24,190,130,'n')+tx(105,40,'one deployable app','s')+
+ bx(22,52,80,40,'Users')+bx(108,52,80,40,'Products')+bx(22,100,80,40,'Orders')+bx(108,100,80,40,'Payments')+
+ ln(230,20,230,160,'dash')+
+ bx(250,30,100,46,'User\nService','a')+bx(370,30,100,46,'Product\nService','a')+bx(250,100,100,46,'Order\nService','a')+bx(370,100,100,46,'Payment\nService','a'),
+ 'One big deployable versus small independent services');
+
+fig('apigw',480,200,
+ bx(5,75,64,40,'Clients')+ar(69,95,105,95)+bx(105,60,110,70,'API gateway\nauth · rate limit\ncache','a')+
+ ar(215,80,290,28)+ar(215,90,290,76)+ar(215,100,290,124)+ar(215,110,290,172)+
+ bx(290,6,175,40,'User service  /user')+bx(290,54,175,40,'Product service  /product')+bx(290,102,175,40,'Order service  /order')+bx(290,150,175,40,'Payment service  /pay'),
+ 'Clients call one endpoint; the gateway routes to the right service');
+
+fig('msscale',480,170,
+ tx(10,12,'Services scale on their own','s','start')+
+ tx(10,42,'Product','t b','start')+bx(110,28,70,28,'inst 1','a')+bx(190,28,70,28,'inst 2','a')+bx(270,28,70,28,'inst 3','a')+tx(355,42,'busiest','s','start')+
+ tx(10,92,'User','t b','start')+bx(110,78,70,28,'inst 1')+bx(190,78,70,28,'inst 2')+
+ tx(10,142,'Payment','t b','start')+bx(110,128,70,28,'inst 1'),
+ 'Give each service only the capacity its traffic needs');
+
+/* ---------- Topic 11 ---------- */
+fig('lbarch',480,170,
+ bx(5,20,60,30,'Client')+bx(5,70,60,30,'Client')+bx(5,120,60,30,'Client')+
+ ar(65,35,120,80)+ar(65,85,120,85)+ar(65,135,120,92)+
+ bx(120,62,80,46,'Load\nbalancer','a')+
+ ar(200,75,300,35,'grn')+ar(200,85,300,85,'grn')+ar(200,95,300,135,'red dash')+
+ bx(300,18,150,34,'Server 1  healthy','g')+bx(300,68,150,34,'Server 2  healthy','g')+bx(300,118,150,34,'Server 3  failed check','r'),
+ 'The load balancer is the single entry point and skips unhealthy servers');
+
+fig('rr',480,150,
+ bx(10,52,80,46,'Load\nbalancer','a')+
+ ar(90,65,230,28)+ar(90,75,230,75)+ar(90,85,230,122)+
+ bx(230,10,100,36,'Server 1')+bx(230,57,100,36,'Server 2')+bx(230,104,100,36,'Server 3')+
+ tx(345,28,'requests 1, 4, 7','s','start')+tx(345,75,'requests 2, 5, 8','s','start')+tx(345,122,'requests 3, 6, 9','s','start'),
+ 'Round robin hands requests out in a fixed circle');
+
+fig('wrr',480,150,
+ bx(10,52,80,46,'Load\nbalancer','a')+
+ ar(90,62,230,24)+ar(90,72,230,66)+ar(90,92,230,114)+
+ bx(230,6,120,36,'Server 1\nweight 1')+bx(230,48,120,36,'Server 2\nweight 1')+bx(230,90,120,52,'Server 3 (bigger)\nweight 2','a')+
+ tx(365,24,'25% of requests','s','start')+tx(365,66,'25% of requests','s','start')+tx(365,116,'50% of requests','s tg','start'),
+ 'Weighted round robin sends more traffic to bigger servers');
+
+fig('lc',480,150,
+ bx(5,52,70,46,'New\nrequest','w')+ar(75,75,110,75,'acc')+bx(110,52,76,46,'Load\nbalancer','a')+
+ ar(186,62,230,28,'acc')+ar(186,75,230,75)+ar(186,88,230,122)+
+ tx(236,28,'Server 1','s','start')+`<rect class="n g" x="295" y="19" width="40" height="18" rx="3"/>`+tx(315,28,'5','s')+tx(345,28,'← fewest, chosen','s tg','start')+
+ tx(236,75,'Server 2','s','start')+`<rect class="n r" x="295" y="66" width="160" height="18" rx="3"/>`+tx(375,75,'20 connections','s')+
+ tx(236,122,'Server 3','s','start')+`<rect class="n w" x="295" y="113" width="96" height="18" rx="3"/>`+tx(343,122,'12','s'),
+ 'Least connections picks the server with the fewest active connections');
+
+fig('hashlb',480,160,
+ bx(5,15,70,28,'User 42')+bx(5,66,70,28,'User 7')+bx(5,117,70,28,'User 99')+
+ ar(75,29,150,70)+ar(75,80,150,82)+ar(75,131,150,95)+
+ bx(150,58,90,48,'hash(user)\n% 3','w')+
+ ar(240,70,330,28,'acc')+ar(240,82,330,80,'acc')+ar(240,94,330,132,'acc')+
+ bx(330,15,100,28,'Server 1')+bx(330,66,100,28,'Server 2')+bx(330,117,100,28,'Server 3')+
+ tx(280,152,'same user → same server','s'),
+ 'Hashing the user always lands on the same server');
+
+/* ---------- Topic 12 ---------- */
+fig('cachelat',480,125,
+ tx(10,14,'No cache:  database 500 ms + compute 100 ms = 600 ms','s','start')+
+ `<rect class="n r" x="10" y="26" width="300" height="24" rx="3"/>`+tx(160,38,'DB 500 ms','s')+`<rect class="n w" x="310" y="26" width="60" height="24" rx="3"/>`+tx(340,38,'100','s')+
+ tx(10,72,'Cache hit:  60 ms','s','start')+`<rect class="n g" x="10" y="84" width="36" height="24" rx="3"/>`+tx(60,96,'← 10× faster','s tg','start'),
+ 'Serving pre-computed data from Redis is about ten times faster');
+
+fig('cacheflow',480,175,
+ bx(5,70,60,36,'Client')+ar(65,88,110,88)+bx(110,66,80,44,'Backend')+
+ ar(190,76,270,38,'acc')+tx(215,48,'1 GET blogs','s ta')+
+ bx(270,18,90,40,'Redis cache','w')+tx(372,38,'hit: return\n~20 ms','s tg','start')+
+ ar(190,100,270,138,'red')+tx(222,132,'2 miss: query','s tr')+
+ db(270,116,90,50,'Database')+tx(372,142,'miss: ~800 ms,\nthen SET + TTL','s tr','start'),
+ 'Check the cache first; on a miss, read the database and store the result');
+
+fig('cachetypes',480,130,
+ bx(0,25,84,46,'Browser\ncache')+ar(84,48,99,48)+bx(99,25,84,46,'CDN\ncache')+ar(183,48,198,48)+bx(198,25,84,46,'Redis\n(server side)','w')+ar(282,48,297,48)+bx(297,25,84,46,'App-level\ncache')+ar(381,48,396,48)+db(396,18,84,58,'Database')+
+ tx(42,92,'HTML, CSS, JS','s')+tx(141,92,'images, video','s')+tx(240,92,'hot data','s')+tx(339,92,'query results','s')+
+ tx(240,116,'closer to the user  ←→  closer to the data','s'),
+ 'Caches can sit at every layer between the user and the database');
+
+fig('writethru',480,150,
+ bx(10,55,90,40,'Server','a')+ar(100,68,250,40,'acc')+ar(100,82,250,112,'acc')+
+ db(250,15,100,50,'Database')+bx(250,92,100,40,'Redis cache','w')+
+ tx(405,75,'both updated\nat the same time\n(e.g. contest\nrank list)','s'),
+ 'Write to the database and the cache together so reads stay fresh');
+
+fig('redisqueue',480,160,
+ tx(10,12,'Queue (FIFO)','t b','start')+
+ tx(35,38,'LPUSH','s ta')+ar(58,38,110,38,'acc')+bx(110,24,60,28,'job3')+bx(176,24,60,28,'job2')+bx(242,24,60,28,'job1','a')+ar(302,38,350,38,'acc')+tx(362,38,'RPOP → job1 (oldest)','s ta','start')+
+ tx(10,84,'Stack (LIFO)','t b','start')+
+ tx(35,104,'LPUSH','s ta')+ar(58,104,110,104,'acc')+bx(110,96,60,28,'job3','a')+bx(176,96,60,28,'job2')+bx(242,96,60,28,'job1')+
+ tx(35,124,'LPOP','s ta')+ar(110,124,58,124,'acc')+tx(260,142,'same end in and out → job3 first','s','start'),
+ 'Redis lists can act as a queue or a stack');
+
+/* ---------- Topic 13 ---------- */
+fig('s3upload',480,160,
+ bx(5,60,60,36,'Client')+ar(65,78,105,78)+tx(85,66,'1','s')+bx(105,56,80,44,'Backend','a')+
+ ar(185,66,290,36,'acc')+tx(225,40,'2 store file','s ta')+bx(290,12,100,40,'S3 bucket\nfile bytes','w')+
+ ar(185,92,290,122,'acc')+tx(228,120,'3 save URL','s ta')+db(290,100,100,50,'Database\nmetadata + URL')+
+ tx(402,32,'cheap,\nscalable','s','start')+tx(402,125,'small rows,\nfast queries','s','start'),
+ 'Files go to blob storage; the database keeps only the link');
+
+fig('presigned',480,205,
+ seq([60,240,420],['Client','Backend','S3'],200,[[0,1,70,'1  I want to upload'],[1,0,100,'2  pre-signed URL (5 min)','acc dash'],[0,2,145,'3  PUT file directly'],[2,0,180,'4  200 OK','acc dash']]),
+ 'The file goes straight to S3 without passing through your servers');
+
+/* ---------- Topic 14 ---------- */
+fig('cdnflow',480,170,
+ bx(5,60,66,40,'User\n(Sydney)')+ar(71,80,150,80,'acc')+tx(110,68,'request','s ta')+
+ bx(150,52,100,56,'Edge server\n(nearest)','a')+
+ ar(250,80,360,80,'dash')+tx(305,68,'miss: fetch','s')+bx(360,52,110,56,'Origin\nS3 in India')+
+ tx(200,128,'hit: served from the edge, fast','s tg')+tx(305,96,'first time only','s')+
+ ar(150,102,71,102,'grn dash'),
+ 'The first request fills the edge cache; later ones are served nearby');
+
+fig('geodns',480,175,
+ bx(5,15,100,34,'User in Sydney')+bx(5,70,100,34,'User in Frankfurt')+bx(5,125,100,34,'User in Mumbai')+
+ ar(105,32,190,32,'acc')+ar(105,87,190,87,'acc')+ar(105,142,190,142,'acc')+
+ tx(148,22,'GeoDNS','s ta')+
+ bx(190,15,100,34,'Edge Sydney','a')+bx(190,70,100,34,'Edge Frankfurt','a')+bx(190,125,100,34,'Edge Mumbai','a')+
+ ar(290,32,380,75,'dash')+ar(290,87,380,87,'dash')+ar(290,142,380,100,'dash')+
+ bx(380,66,90,42,'Origin\n(S3)'),
+ 'GeoDNS sends each user to the nearest edge location');
+
+/* ---------- Topic 15 ---------- */
+fig('syncasync',480,180,
+ tx(110,12,'Synchronous','t b')+tx(365,12,'Asynchronous','t b')+
+ bx(10,40,60,34,'Client')+bx(140,40,70,34,'Server')+ar(70,50,140,50)+tx(105,40,'10 min task','s')+
+ ar(140,66,70,66,'red dash')+tx(105,88,'waits… timeout ✗','s tr')+
+ ln(240,25,240,170,'dash')+
+ bx(255,40,60,34,'Client')+bx(355,40,70,34,'Server')+ar(315,50,355,50)+ar(355,66,315,66,'grn dash')+tx(258,98,'reply: processing','s tg','start')+
+ bx(290,120,60,32,'Queue','w')+bx(390,120,66,32,'Worker')+ar(395,74,330,120,'acc')+ar(350,136,390,136,'acc')+tx(423,166,'email when done','s'),
+ 'Asynchronous work returns immediately and finishes in the background');
+
+fig('queue',480,170,
+ bx(5,64,76,40,'Producer')+ar(81,84,115,84)+
+ rc(115,68,160,32,'n')+bx(122,73,42,22,'m3','w')+bx(169,73,42,22,'m2','w')+bx(216,73,42,22,'m1','w')+tx(195,56,'Message queue','s')+
+ ar(275,78,340,32)+ar(275,84,340,84)+ar(275,90,340,136)+
+ bx(340,16,120,32,'Worker 1')+bx(340,68,120,32,'Worker 2')+bx(340,120,120,32,'Worker 3')+
+ tx(195,128,'a worker deletes the message\nafter it succeeds','s'),
+ 'Add workers to process messages in parallel');
+
+fig('dualqueue',480,160,
+ bx(5,58,86,40,'Upload\nservice')+ar(91,68,150,38,'grn')+ar(91,88,150,122,'red dash')+
+ bx(150,22,80,32,'Queue 1','w')+bx(150,106,80,32,'Queue 2','w')+
+ ar(230,38,320,38)+ar(230,122,320,122)+bx(320,22,110,32,'Transcoder')+bx(320,106,110,32,'Captions')+
+ tx(100,146,'✗ crash before this write','s tr'),
+ 'Two queues risk a video transcoded but never captioned');
+
+fig('stream',480,175,
+ bx(5,70,70,36,'Producer')+ar(75,88,125,88,'acc')+
+ [1,2,3,4,5,6].map((n,i)=>bx(125+i*54,72,50,32,'e'+n,'w')).join('')+
+ bx(290,8,110,32,'Transcoder\nat e5','a')+ar(345,40,345,70,'acc')+
+ bx(203,130,110,32,'Captions\nat e3','a')+ar(258,130,258,106,'acc')+
+ tx(335,146,'messages are kept','s','start'),
+ 'Each consumer group keeps its own position in the same stream');
+
+/* ---------- Topic 16 ---------- */
+fig('uberkafka',480,150,
+ bx(0,45,76,48,'1000s of\ndrivers')+ar(76,69,126,69,'acc')+tx(101,56,'2 s','s')+
+ bx(126,45,76,48,'Kafka\ntopic','w')+ar(202,69,252,69)+tx(227,56,'batch','s')+
+ bx(252,45,76,48,'Consumer')+ar(328,69,388,69,'acc')+tx(358,56,'10 min','s')+
+ db(388,38,90,62,'Database')+
+ tx(240,126,'The database sees a few bulk writes, not thousands per second','s'),
+ 'Kafka absorbs the write storm and the database gets batches');
+
+fig('kafkaarch',480,175,
+ bx(5,64,70,40,'Producers')+ar(75,84,110,84)+
+ rc(110,12,150,150)+tx(185,26,'Topic: video','s')+
+ bx(125,40,120,30,'Partition 0','w')+bx(125,80,120,30,'Partition 1','w')+bx(125,120,120,30,'Partition 2','w')+
+ ar(260,60,320,40)+ar(260,95,320,40)+ar(260,130,320,115)+
+ rc(320,12,155,64,'a')+tx(397,24,'Group: transcoder','s')+bx(330,36,60,30,'C1')+bx(400,36,60,30,'C2')+
+ rc(320,96,155,64,'a')+tx(397,108,'Group: captions','s')+bx(330,120,60,30,'C1'),
+ 'Each group reads every message; each partition goes to one consumer per group');
+
+fig('rebalance',480,160,
+ tx(95,10,'Partitions','s')+tx(345,10,'Consumers (one group)','s')+
+ [0,1,2,3].map(i=>bx(60,22+i*34,70,26,'P'+i,'w')).join('')+
+ bx(300,22,90,26,'C1','a')+bx(300,56,90,60,'C2','a')+bx(300,124,90,26,'C3','a')+
+ ar(130,35,300,35)+ar(130,69,300,76)+ar(130,103,300,96)+ar(130,137,300,137)+
+ tx(405,86,'Kafka\nrebalances\nautomatically','s','start'),
+ 'Kafka spreads 4 partitions across 3 consumers on its own');
+
+fig('idle',480,150,
+ tx(240,10,'4 partitions','s')+
+ [0,1,2,3].map(i=>bx(40+i*105,20,80,26,'P'+i,'w')).join('')+
+ [0,1,2,3].map(i=>ar(80+i*105,46,48+i*78+30,92)).join('')+
+ [0,1,2,3,4,5].map(i=>bx(8+i*78,92,70,30,'C'+(i+1),i<4?'a':'d')).join('')+
+ tx(240,140,'C5 and C6 sit idle: one partition feeds only one consumer in a group','s'),
+ 'More consumers than partitions leaves the extra ones idle');
+
+/* ---------- Topic 17 ---------- */
+fig('pullpush',480,170,
+ tx(115,12,'Message broker: pull','t b')+tx(365,12,'Pub/Sub: push','t b')+
+ bx(10,50,70,36,'Consumer')+bx(150,50,70,36,'Broker','w')+ar(80,60,150,60,'acc')+tx(115,48,'any messages?','s ta')+ar(150,78,80,78,'dash')+tx(115,98,'message','s')+
+ tx(115,138,'consumer asks','s')+
+ ln(240,25,240,160,'dash')+
+ bx(255,50,70,36,'Broker','w')+bx(385,22,90,30,'Subscriber 1')+bx(385,84,90,30,'Subscriber 2')+ar(325,62,385,37,'acc')+ar(325,74,385,99,'acc')+tx(360,138,'broker pushes instantly','s'),
+ 'Pull waits for the consumer; push delivers immediately');
+
+fig('chatproblem',480,150,
+ bx(5,20,64,32,'Client 1')+ar(69,36,130,36)+bx(130,20,76,32,'Server 1')+
+ bx(290,98,76,32,'Server 2')+ar(366,114,410,114)+bx(410,98,64,32,'Client 3')+
+ ar(190,52,300,98,'red dash')+tx(270,66,'no way to reach\nClient 3 ✗','s tr'),
+ 'Server 1 cannot deliver to a client connected to Server 2');
+
+fig('chatpubsub',480,170,
+ bx(5,20,60,30,'Client 1')+ar(65,35,90,35)+bx(90,20,70,30,'Server 1')+
+ ar(160,40,215,70,'acc')+tx(170,62,'PUBLISH','s ta')+
+ bx(215,58,80,40,'Redis\nPub/Sub','w')+
+ ar(295,68,335,35,'acc')+ar(295,88,335,125,'acc')+
+ bx(335,20,66,30,'Server 2')+bx(335,110,66,30,'Server 3')+
+ ar(401,35,418,35)+ar(401,125,418,125)+bx(418,20,60,30,'Client 3')+bx(418,110,60,30,'Client 4'),
+ 'Servers publish to Redis, which pushes to every subscribed server');
+
+/* ---------- Topic 18 ---------- */
+fig('eda',480,190,
+ bx(10,56,90,44,'Order\nservice','a')+bx(10,140,90,34,'Payment')+ar(55,100,55,140)+tx(95,121,'sync REST','s')+
+ ar(100,78,170,78,'acc')+tx(135,66,'event','s ta')+bx(170,60,76,36,'Broker','w')+
+ ar(246,70,330,30,'acc')+ar(246,78,330,80,'acc')+ar(246,86,330,130,'acc')+
+ bx(330,12,140,36,'Inventory')+bx(330,62,140,36,'Notification')+bx(330,112,140,36,'Analytics (new)','d')+
+ tx(240,176,'Order publishes “OrderPlaced” and moves on','s'),
+ 'The producer publishes an event; consumers react independently');
+
+fig('edapat',480,170,
+ tx(115,12,'Simple event notification','t b')+tx(365,12,'Event-carried state transfer','t b')+
+ bx(15,28,200,32,'{ order_id: 981 }','w')+bx(15,95,80,32,'Consumer')+ar(55,60,55,95)+
+ db(150,86,60,50,'DB')+ar(95,112,150,112,'red dash')+tx(120,100,'extra call','s tr')+
+ ln(240,20,240,160,'dash')+
+ bx(255,28,215,32,'{ id, items, address, email }','w')+bx(330,95,80,32,'Consumer')+ar(370,60,370,95)+
+ tx(370,148,'no extra call, but a bigger event','s tg')+tx(115,148,'small event, but more calls','s'),
+ 'Small events plus lookups versus bigger self-contained events');
+
+/* ---------- Topic 19 ---------- */
+fig('primes',480,165,
+ bx(10,58,90,44,'Leader','a')+
+ ar(100,70,190,28,'acc bi')+ar(100,80,190,80,'acc bi')+ar(100,90,190,132,'acc bi')+
+ bx(190,10,180,36,'Worker 1:  0 … 10¹⁰')+bx(190,62,180,36,'Worker 2:  10¹⁰+1 … 10²⁰')+bx(190,114,180,36,'Worker 3:  and so on')+
+ tx(430,80,'partial\ncounts are\nsummed','s'),
+ 'Split the work, compute in parallel, combine the results');
+
+fig('leaderfollower',480,175,
+ bx(5,70,60,36,'Client')+ar(65,88,105,88)+
+ rc(95,10,380,155,'d')+tx(285,24,'looks like one machine to the client','s')+
+ bx(110,66,80,44,'Leader','a')+
+ ar(190,78,310,45,'acc')+ar(190,88,310,88,'acc')+ar(190,98,310,131,'acc')+
+ bx(310,30,150,30,'Follower 1')+bx(310,73,150,30,'Follower 2')+bx(310,116,150,30,'Follower 3'),
+ 'The leader hands out work; followers do it and report back');
+
+/* ---------- Topic 20 ---------- */
+fig('orchchain',480,200,
+ bx(190,6,100,36,'Leader\norchestrator','a')+
+ ar(215,42,150,86)+ar(265,42,330,86)+
+ bx(100,86,100,34,'Orchestrator')+bx(280,86,100,34,'Orchestrator')+
+ ar(130,120,70,160)+ar(170,120,170,160)+ar(310,120,310,160)+ar(350,120,410,160)+
+ bx(30,160,80,30,'Server','g')+bx(130,160,80,30,'Server','g')+bx(270,160,80,30,'Server','g')+bx(370,160,80,30,'Server','g')+
+ tx(400,24,'watches and\nrestarts below','s','start')+tx(60,24,'if the leader dies,\none is elected','s'),
+ 'Every layer is watched by the layer above; the leader is re-elected');
+
+fig('heartbeat',480,130,
+ ln(20,60,460,60)+
+ [40,100,160,220].map(x=>tx(x,40,'♥','t ta')+ln(x,52,x,68)).join('')+
+ tx(280,40,'✗','t tr')+tx(340,40,'✗','t tr')+
+ `<rect class="n w" x="250" y="76" width="130" height="22" rx="4"/>`+tx(315,87,'timeout window','s')+
+ bx(390,50,80,36,'Election','a')+
+ tx(130,100,'leader sends a heartbeat every 3 s','s')+tx(240,122,'heartbeats stop, so followers start an election','s'),
+ 'Missing heartbeats reveal a dead leader');
+
+fig('splitbrain',480,160,
+ rc(10,20,200,100,'n')+tx(110,36,'Side with 3 of 5 nodes','s')+cc(55,80,16,'N1','g')+cc(110,80,16,'N2','g')+cc(165,80,16,'N3','g')+tx(110,108,'majority → may elect a leader','s tg')+
+ tx(240,70,'✂','t tr')+
+ rc(270,20,200,100,'n')+tx(370,36,'Side with 2 of 5 nodes','s')+cc(320,80,16,'N4','r')+cc(420,80,16,'N5','r')+tx(370,108,'minority → no leader','s tr')+
+ tx(240,145,'Majority quorum prevents two leaders at once','s'),
+ 'Only the side with more than half the nodes may elect a leader');
+
+/* ---------- Topic 21 ---------- */
+fig('coordworker',480,170,
+ bx(5,64,60,40,'Client')+ar(65,84,95,84)+bx(95,54,90,60,'Coordinator\nsplit · retry\nmerge','a')+
+ ar(185,70,260,28)+ar(185,84,260,84)+ar(185,98,260,140)+
+ bx(260,10,100,36,'Worker 1\nchunk A')+bx(260,66,100,36,'Worker 2\nchunk B')+bx(260,122,100,36,'Worker 3\nchunk C')+
+ ar(360,28,400,75,'dash')+ar(360,84,400,84,'dash')+ar(360,140,400,95,'dash')+
+ bx(400,64,70,40,'Combined\nresult','g'),
+ 'The coordinator splits the data, restarts failed workers and merges results');
+
+/* ---------- Topic 22 ---------- */
+fig('strongeventual',480,175,
+ tx(110,12,'Strong consistency','t b')+tx(365,12,'Eventual consistency','t b')+
+ bx(15,30,60,30,'A  v2','g')+bx(85,30,60,30,'B  v2','g')+bx(155,30,60,30,'C  v2','g')+tx(115,78,'every read sees v2','s tg')+
+ ln(240,22,240,165,'dash')+
+ bx(255,30,60,30,'A  v2','g')+bx(325,30,60,30,'B  v1','w')+bx(395,30,60,30,'C  v1','w')+tx(365,78,'briefly stale','s')+
+ ar(365,92,365,112,'acc')+tx(365,100,'time','s ta','start')+
+ bx(255,116,60,30,'A  v2','g')+bx(325,116,60,30,'B  v2','g')+bx(395,116,60,30,'C  v2','g')+tx(365,162,'later: all converge to v2','s tg'),
+ 'Strong reads are always fresh; eventual reads catch up shortly after');
+
+fig('quorum',480,150,
+ tx(240,10,'N = 5 replicas,  W = 3,  R = 3','t b')+
+ [0,1,2,3,4].map(i=>bx(10+i*94,50,84,34,'Node '+(i+1),i===2?'a':(i<2?'g':(i>2?'w':''))) ).join('')+
+ ln(10,98,272,98,'grn')+tx(141,112,'write acknowledged by 3','s tg')+
+ ln(198,38,460,38,'')+tx(329,26,'read asks 3 nodes','s')+
+ tx(240,138,'W + R = 6 is more than N = 5, so every read overlaps the latest write (Node 3)','s'),
+ 'When W + R is greater than N, reads and writes share a node');
+
+fig('syncasyncrep',480,215,
+ tx(10,12,'Synchronous replication','t b','start')+
+ bx(5,36,60,32,'Client')+bx(170,36,80,32,'Primary','a')+bx(350,36,80,32,'Replica')+
+ ar(65,46,170,46)+ar(250,46,350,46,'acc')+ar(350,60,250,60,'dash')+ar(170,60,65,60,'grn dash')+
+ tx(118,35,'1 write','s')+tx(300,35,'2 copy','s ta')+tx(118,78,'4 ack after replica','s tg')+
+ tx(10,104,'Asynchronous replication','t b','start')+
+ bx(5,128,60,32,'Client')+bx(170,128,80,32,'Primary','a')+bx(350,128,80,32,'Replica')+
+ ar(65,138,170,138)+ar(170,152,65,152,'grn dash')+ar(250,144,350,144,'acc dash')+
+ tx(118,127,'1 write','s')+tx(118,170,'2 ack at once','s tg')+tx(300,160,'3 copy later','s ta')+
+ tx(240,200,'Async is faster but replicas can lag or lose the last writes','s'),
+ 'Synchronous waits for the replica; asynchronous copies in the background');
+
+{const cx=240,cy=88,r=62;const p=i=>[cx+r*Math.sin(i*Math.PI/3),cy-r*Math.cos(i*Math.PI/3)];
+let s='';[[0,2],[2,5],[5,3],[1,4],[0,3],[1,5]].forEach(([a,b],i)=>{const A=p(a),B=p(b);s+=ln(A[0],A[1],B[0],B[1],i<3?'acc':'dash')});
+for(let i=0;i<6;i++){const q=p(i);s+=cc(q[0],q[1],15,'N'+(i+1),i===0?'a':'')}
+s+=tx(240,176,'each node tells a few peers; news reaches everyone in about log N rounds','s');
+fig('gossip',480,190,s,'Gossip spreads updates and failure news node by node')}
+
+/* ---------- Topic 23 ---------- */
+{const k=['k1','k2','k3','k4','k5','k6'],h=[1,2,3,4,5,6];
+let s=tx(10,18,'hash','s','start')+tx(10,58,'% 3 servers','s','start')+tx(10,98,'% 2 servers','s','start');
+k.forEach((n,i)=>{const x=100+i*64,a=h[i]%3,b=h[i]%2,moved=a!==b;
+ s+=bx(x,6,56,24,n+' ('+h[i]+')')+bx(x,46,56,24,'S'+a)+bx(x,86,56,24,'S'+b,moved?'r':'g')});
+s+=tx(240,134,'Going from 3 to 2 servers moves 4 of 6 keys (red)','s tr');
+fig('modhash',480,148,s,'Simple modulo hashing reshuffles most keys when the server count changes')}
+
+{const ringFig=(removed)=>{const cx=240,cy=108,r=88;const P=(d,rr=r)=>[cx+rr*Math.sin(d*Math.PI/180),cy-rr*Math.cos(d*Math.PI/180)];
+let s=`<circle class="ln" cx="${cx}" cy="${cy}" r="${r}"/>`;
+const keys=[[350,'k4'],[15,'k1'],[105,'k3'],[205,'k2'],[255,'k5']];
+keys.forEach(([d,n])=>{const q=P(d);s+=cc(q[0],q[1],10,n,(removed&&n==='k3')?'w':'')});
+[[45,'N1'],[165,'N2'],[285,'N3']].forEach(([d,n])=>{const q=P(d);
+ s+=(removed&&n==='N2')?`<rect class="n d" x="${q[0]-16}" y="${q[1]-11}" width="32" height="22" rx="5"/>`+tx(q[0],q[1],'N2 ✗','s tr'):`<rect class="n a" x="${q[0]-16}" y="${q[1]-11}" width="32" height="22" rx="5"/>`+tx(q[0],q[1],n,'t b')});
+if(removed){const a=P(115),b=P(272);s+=`<path class="ar red dash" d="M${a[0]} ${a[1]} A${r} ${r} 0 0 1 ${b[0]} ${b[1]}"/>`;s+=tx(cx,cy,'k3 moves to\nthe next node\nclockwise.\nNothing else\nmoves.','s')}
+else s+=tx(cx,cy,'key → first\nnode clockwise\n\nk1, k4 → N1\nk3 → N2\nk2, k5 → N3','s');
+return s};
+fig('ring',480,216,ringFig(false),'Servers and keys are hashed onto the same ring');
+fig('ringremove',480,216,ringFig(true),'Removing a node only moves the keys it owned')}
+
+/* ---------- Topic 24 ---------- */
+fig('backup',480,160,
+ ln(30,60,450,60)+
+ bx(18,40,44,40,'2 AM\nbackup','g')+bx(300,40,44,40,'2 AM\nnext','n d')+
+ ln(285,48,285,72,'red')+tx(285,34,'crash 11 PM','s tr')+
+ `<path class="ln red" d="M40 96 H285"/>`+tx(162,112,'up to ~21 hours of data lost','s tr')+
+ tx(240,140,'Continuous replication keeps this window near zero','s tg'),
+ 'A nightly backup can lose almost a full day of writes');
+
+fig('primaryreplica',480,200,
+ tx(10,12,'Normal','t b','start')+
+ bx(5,30,60,34,'App')+ar(65,47,150,47,'acc')+db(150,24,90,50,'Primary','a')+ar(240,49,330,49,'acc dash')+tx(285,38,'replicate','s ta')+db(330,24,90,50,'Replica')+tx(375,86,'idle, in sync','s')+
+ tx(10,112,'After the primary fails','t b','start')+
+ bx(5,128,60,34,'App')+ar(65,145,330,145,'grn')+db(150,122,90,50,'Primary ✗','r')+db(330,122,90,50,'New primary','g')+tx(280,134,'failover','s tg'),
+ 'The replica is promoted when the main database fails');
+
+/* ---------- Topic 25 ---------- */
+fig('fwdrev',480,185,
+ tx(115,12,'Forward proxy: hides the client','t b')+tx(365,12,'Reverse proxy: hides the servers','t b')+
+ bx(5,78,56,34,'Client')+ar(61,95,82,95)+bx(82,70,64,50,'Forward\nproxy','a')+ar(146,95,166,95)+bx(166,78,60,34,'Server')+
+ tx(115,148,'VPN, filtering, caching','s')+tx(115,164,'server sees the proxy IP','s')+
+ ln(240,25,240,175,'dash')+
+ bx(250,78,52,34,'Client')+ar(302,95,322,95)+bx(322,70,62,50,'Reverse\nproxy','a')+ar(384,85,408,50)+ar(384,105,408,130)+bx(408,35,66,30,'Server 1')+bx(408,115,66,30,'Server 2')+
+ tx(365,148,'Nginx, load balancer, SSL','s')+tx(365,164,'client sees only the proxy','s'),
+ 'A forward proxy represents clients; a reverse proxy represents servers');
+
+fig('reverseproxy',480,185,
+ bx(5,75,56,36,'Client')+ar(61,93,95,93)+bx(95,62,110,62,'Reverse proxy\n:8080','a')+
+ ar(205,75,300,30,'acc')+tx(240,42,'/product','s ta')+
+ ar(205,93,300,90,'acc')+tx(245,80,'/order','s ta')+
+ ar(205,111,300,148,'red dash')+tx(245,142,'anything else','s tr')+
+ bx(300,10,170,40,'Product service\n:5001')+bx(300,70,170,40,'Order service\n:5002')+bx(300,130,170,36,'404 Not found','r'),
+ 'The proxy reads the URL and forwards to the matching service');
+
+/* ---------- Topic 26 ---------- */
+fig('steps',480,175,
+ bx(0,10,140,48,'1  Understand the\nproblem')+ar(140,34,170,34)+bx(170,10,140,48,'2  Break into\nsub-problems')+ar(310,34,340,34)+bx(340,10,140,48,'3  Solve each\nsub-problem','a')+
+ ar(410,58,410,92,'acc')+
+ bx(0,104,112,44,'Database','w')+bx(122,104,112,44,'Caching','w')+bx(244,104,112,44,'Scaling and\nfault tolerance','w')+bx(366,104,114,44,'Communication\n(sync or async)','w')+
+ tx(240,166,'Decide these four things for every sub-problem','s'),
+ 'A repeatable approach for any system design question');
+
+fig('fourthings',480,185,
+ bx(185,68,110,44,'Order\nservice','a')+
+ bx(5,8,170,46,'Database\nSQL for ACID','w')+bx(305,8,170,46,'Caching\nnone on writes','w')+
+ bx(5,128,170,46,'Scaling and fault tolerance\n4 instances + replica','w')+bx(305,128,170,46,'Communication\nREST pay, events email','w')+
+ ar(175,40,200,68,'bi')+ar(305,40,280,68,'bi')+ar(175,148,200,112,'bi')+ar(305,148,280,112,'bi'),
+ 'Four decisions per sub-problem, shown for an order service');
+
+{const seg=[['Requirements',5],['Estimate',5],['High-level design',15],['Deep dive',15],['Wrap-up',5]];
+let s=tx(240,12,'45 minutes','t b'),x=20;
+seg.forEach(([n,m],i)=>{const w=m*9.78;s+=`<rect class="n ${['g','g','a','a','w'][i]}" x="${x}" y="30" width="${w}" height="40" rx="4"/>`+tx(x+w/2,50,m>5?n:(i===0?'Req.':i===1?'Est.':'Wrap'),'s')+tx(x+w/2,86,m+' min','s');x+=w});
+fig('interviewtime',480,125,s,'A sample split of a 45-minute design interview')}
+
+/* ---------- Mapping: question prefix -> diagram ---------- */
+const FIGMAP=[
+[`Why do we need to study system design`,'basic'],
+[`What is a single point of failure`,'spof'],
+[`What is the difference between a prototype architecture`,'prodarch'],
+[`How do you decide how far to scale`,'scalestep'],
+[`What happens when you type`,'dnsflow'],
+[`What is DNS and why`,'dnsflow'],
+[`What is an IP address and what is a port`,'portmux'],
+[`If many applications run on one server`,'portmux'],
+[`How do you make an app that runs on your laptop`,'deploy'],
+[`What is an EC2 instance and what does`,'deploy'],
+[`Explain latency vs throughput with an analogy`,'latthru'],
+[`What is Round Trip Time`,'rtt'],
+[`What is vertical scaling`,'vh'],
+[`What is horizontal scaling`,'vh'],
+[`Compare vertical and horizontal`,'vh'],
+[`Why do we need a load balancer in horizontal scaling`,'lbscale'],
+[`What is auto scaling`,'autoscale'],
+[`Show a quick capacity calculation`,'autoscale'],
+[`What triggers an auto scaling action`,'asg'],
+[`What infrastructure must sit in front`,'asg'],
+[`Which three things does the article suggest`,'botepipe'],
+[`How do you do storage estimation`,'twitterstore'],
+[`How do you estimate the number of servers`,'servercalc'],
+[`What does the CAP theorem state`,'captri'],
+[`What is a distributed system, and what is a node`,'nodes3'],
+[`What is the difference between availability and partition`,'partition'],
+[`Why can't we have all three`,'partition'],
+[`In what order should you scale a database`,'scalestep'],
+[`What is indexing and how does it`,'btree'],
+[`What is partitioning?`,'partitioning'],
+[`What is the master-slave`,'masterslave'],
+[`What problem can asynchronous replication cause`,'syncasyncrep'],
+[`What is a multi-master setup`,'multimaster'],
+[`What is database sharding`,'sharding'],
+[`Explain the four sharding strategies`,'shardstrat'],
+[`What does ACID stand for`,'acid'],
+[`What are the four types of NoSQL`,'sqlnosql'],
+[`Can a single system use more than one database type`,'polyglot'],
+[`What are microservices?`,'monomicro'],
+[`What is a monolith?`,'monomicro'],
+[`How do clients call services`,'apigw'],
+[`Can each microservice be scaled independently`,'msscale'],
+[`What is a load balancer and why`,'lbarch'],
+[`What is a health check`,'lbarch'],
+[`How does the Round Robin`,'rr'],
+[`How does Weighted Round Robin`,'wrr'],
+[`How does the Least Connections`,'lc'],
+[`How does Hash-Based load balancing`,'hashlb'],
+[`Walk through the caching example`,'cachelat'],
+[`What are cache hit and cache miss`,'cacheflow'],
+[`Describe the cache-aside flow`,'cacheflow'],
+[`What are the four types of caches`,'cachetypes'],
+[`What is the second caching approach`,'writethru'],
+[`How do you implement a queue and a stack with Redis`,'redisqueue'],
+[`Describe an image upload feature`,'s3upload'],
+[`Why don't we store blobs in a regular database`,'s3upload'],
+[`What are pre-signed URLs`,'presigned'],
+[`Why do we need a CDN`,'cdnflow'],
+[`How does a CDN work step by step`,'cdnflow'],
+[`What is GeoDNS`,'geodns'],
+[`What is the difference between synchronous and asynchronous`,'syncasync'],
+[`How does a message queue work`,'queue'],
+[`Why is a message queue not enough`,'dualqueue'],
+[`How does a message stream differ`,'stream'],
+[`Explain the Uber driver-location`,'uberkafka'],
+[`What is a partition and why`,'kafkaarch'],
+[`What is a consumer group`,'kafkaarch'],
+[`How does Kafka assign 4 partitions`,'rebalance'],
+[`What happens if there are more consumers than partitions`,'idle'],
+[`How does Pub/Sub differ from a message broker`,'pullpush'],
+[`Explain the chat app problem`,'chatproblem'],
+[`How does Redis Pub/Sub solve it`,'chatpubsub'],
+[`Describe the problem EDA solves`,'eda'],
+[`What is event-driven architecture`,'eda'],
+[`What is Simple Event Notification`,'edapat'],
+[`What is Event-Carried State Transfer`,'edapat'],
+[`Describe the prime-number example`,'primes'],
+[`What is the leader-follower model`,'leaderfollower'],
+[`Describe the full auto-recovery chain`,'orchchain'],
+[`Who monitors the orchestrator`,'orchchain'],
+[`How do nodes detect that a leader`,'heartbeat'],
+[`What is split-brain`,'splitbrain'],
+[`Describe the coordinator-worker architecture`,'coordworker'],
+[`What is strong consistency`,'strongeventual'],
+[`What is eventual consistency`,'strongeventual'],
+[`Explain quorum-based consistency`,'quorum'],
+[`What is synchronous replication`,'syncasyncrep'],
+[`What is asynchronous replication`,'syncasyncrep'],
+[`How does the gossip protocol`,'gossip'],
+[`What is the simple hashing approach`,'modhash'],
+[`How does consistent hashing work`,'ring'],
+[`What happens when a node is removed`,'ringremove'],
+[`What are traditional backup strategies`,'backup'],
+[`What is the drawback of daily`,'backup'],
+[`What is continuous redundancy`,'primaryreplica'],
+[`What does the replica do`,'primaryreplica'],
+[`What is a forward proxy`,'fwdrev'],
+[`What is a reverse proxy`,'fwdrev'],
+[`What is the key difference between forward`,'fwdrev'],
+[`How would you build a simple reverse proxy`,'reverseproxy'],
+[`Describe the request flow through a reverse proxy`,'reverseproxy'],
+[`What approach does the article suggest`,'steps'],
+[`What four things should you decide`,'fourthings'],
+[`How would you structure a 45-minute`,'interviewtime']
+];
+
 
 
 (function(){
@@ -1170,6 +1934,7 @@ const LV={e:'Easy',m:'Medium',h:'Hard'};
 const strip=h=>h.replace(/<[^>]+>/g,' ').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
 const ALL=[];
 T.forEach((t,ti)=>t.q.forEach((x,qi)=>ALL.push({id:ti+'-'+qi,ti,qi,lvl:x[0],q:x[1],a:x[2],ex:x[3],text:strip(x[1]+' '+x[2]+' '+x[3]).toLowerCase()})));
+FIGMAP.forEach(([p,k])=>{const x=ALL.find(y=>y.q.startsWith(p));if(x&&G[k])x.fig=G[k]});
 const BY=Object.fromEntries(ALL.map(x=>[x.id,x]));
 
 /* storage with in-memory fallback */
@@ -1223,7 +1988,7 @@ function cardHTML(x,showFrom){
     </button>
     <div class="body" ${isOpen?'':'hidden'}>
       <button class="btn reveal" data-act="reveal">Show answer</button>
-      <div class="answer"><p>${x.a}</p><div class="ex"><b>Example</b>${x.ex}</div></div>
+      <div class="answer"><p>${x.a}</p>${x.fig||''}<div class="ex"><b>Example</b>${x.ex}</div></div>
       <div class="foot"><button class="known-btn" data-act="known" aria-pressed="${isK}">${isK?'Marked as known':'Mark as known'}</button></div>
     </div></article>`;
 }
@@ -1332,7 +2097,7 @@ function drawDrill(){
   d.innerHTML=`<div class="dcard ${x.lvl}">
     <div class="dtop"><span>Card ${di+1} of ${deck.length} · ${esc(T[x.ti].t)} · <b style="color:var(--c)">${LV[x.lvl]}</b></span><button class="btn small" id="dExit">Exit</button></div>
     <p class="dq">${esc(x.q)}</p>
-    ${shown?`<div class="answer"><p>${x.a}</p><div class="ex"><b>Example</b>${x.ex}</div></div>
+    ${shown?`<div class="answer"><p>${x.a}</p>${x.fig||''}<div class="ex"><b>Example</b>${x.ex}</div></div>
       <div class="dbtns"><button class="btn primary" id="dGot">I knew it</button><button class="btn" id="dAgain">Review later</button></div>`
       :`<div class="dbtns"><button class="btn primary" id="dShow">Show answer</button><button class="btn" id="dSkip">Skip</button></div>`}
   </div>`;
